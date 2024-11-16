@@ -60,27 +60,31 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Account Management</SidebarGroupLabel>
+          <SidebarGroupLabel>Account settings</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton 
-                  onClick={() => handleNavigation('/user-profile')}
-                  className={currentPath === '/user-profile' ? 'bg-orange-100' : ''}
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton 
-                  onClick={() => handleNavigation('/settings')}
-                  className={currentPath === '/settings' ? 'bg-orange-100' : ''}
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              <SidebarMenuButton>
+                <Settings className="mr-2 h-4 w-4" />
+                Account settings
+              </SidebarMenuButton>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton 
+                    onClick={() => handleNavigation('/manage-plan')}
+                    className={currentPath === '/manage-plan' ? 'bg-orange-100' : ''}
+                  >
+                    Manage your plan
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton 
+                    onClick={() => handleNavigation('/social-integrations')}
+                    className={currentPath === '/social-integrations' ? 'bg-orange-100' : ''}
+                  >
+                    Social integrations
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -103,7 +103,11 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
                       <CalendarComponent
                         mode="single"
                         selected={date}
-                        onSelect={setDate}
+                        onSelect={(selectedDate) => {
+                          if (selectedDate && selectedDate > new Date()) {
+                            setDate(selectedDate);
+                          }
+                        }}
                         initialFocus
                       />
                     </PopoverContent>

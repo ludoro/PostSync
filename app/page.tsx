@@ -27,7 +27,7 @@ export default function Page() {
             </div>
 
             <Button variant="default" className="bg-orange-500 hover:bg-orange-600 text-white">
-              Login
+              <Link href="/sign-in" className="text-white">Login</Link>
             </Button>
           </nav>
         </div>
