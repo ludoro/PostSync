@@ -15,16 +15,16 @@ export default function Dashboard() {
   const [date, setDate] = React.useState<Date>()
   const [time, setTime] = React.useState<string>('12:00')
   const [postContent, setPostContent] = React.useState('')
-  const [hasPlan, setHasPlan] = React.useState(true)
+  const [hasIgnoreOverlay, setHasIgnoredOverlay] = React.useState(true)
   const handlePlanSelection = () => {
     // Handle the plan selection here
     // You might want to make an API call to your backend
-    setHasPlan(true)
+    setHasIgnoredOverlay(true)
   }
 
   return (
     <SidebarProvider>
-      {!hasPlan && <PlanSelectionOverlay onSelectPlan={handlePlanSelection} />}
+      {!hasIgnoreOverlay && <PlanSelectionOverlay onSelectPlan={handlePlanSelection} />}
       <div className="grid h-screen grid-cols-[280px_1fr_300px]">
         {/* Sidebar */}
         <MainSidebar currentPath="/dashboard"/>
