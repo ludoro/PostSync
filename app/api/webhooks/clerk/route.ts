@@ -91,6 +91,33 @@ export async function POST(req: Request) {
     }
   }
 
+  if (eventType === 'user.deleted') {
+    const { id } = evt.data;
+
+    try {
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error;
+
+      return new Response(JSON.stringify({
+        message: 'User successfully deleted from Supabase'
+      }), {
+        status: 200
+      })
+
+    } catch (error) {
+      console.error('Error deleting user from Supabase:', error)
+      return new Response(JSON.stringify({
+        error: 'Error deleting user from Supabase'
+      }), {
+        status: 500
+      })
+    }
+  }
+
   return new Response('Webhook received', {
     status: 200
   })
