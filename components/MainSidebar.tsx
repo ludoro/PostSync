@@ -1,7 +1,7 @@
-// components/MainSidebar.tsx
 'use client'
 
 import * as React from 'react'
+import { useState, useEffect } from 'react'
 import { FileText, Settings, User } from 'lucide-react'
 import {
   Sidebar,
@@ -19,7 +19,34 @@ interface MainSidebarProps {
   currentPath?: string;
 }
 
+interface UserData {
+  first_name: string;
+  // Add other user data fields as needed
+}
+
 export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/user');
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        const data = await response.json();
+        setUserData(data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handleNavigation = (path: string) => {
     window.location.href = path;
   };
@@ -27,7 +54,15 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
   return (
     <Sidebar className="border-r">
       <SidebarHeader className="border-b px-6 py-4">
-        <h2 className="text-lg font-semibold text-orange-500">Dashboard</h2>
+        <h2 className="text-lg font-semibold text-orange-500">
+          {loading ? (
+            'Loading...'
+          ) : userData?.first_name ? (
+            `Hey, ${userData.first_name}!`
+          ) : (
+            'Dashboard'
+          )}
+        </h2>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
