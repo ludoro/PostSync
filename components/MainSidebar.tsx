@@ -37,10 +37,6 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
           <SidebarGroupLabel>Content Management</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuButton>
-                <FileText className="mr-2 h-4 w-4" />
-                Content
-              </SidebarMenuButton>
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton 
@@ -74,10 +70,6 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
           <SidebarGroupLabel>Account settings</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuButton>
-                <Settings className="mr-2 h-4 w-4" />
-                Account settings
-              </SidebarMenuButton>
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton 
