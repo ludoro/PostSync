@@ -27,17 +27,18 @@ interface IntegrationItemProps {
   platform: string;
   action: string;
 }
-
 function IntegrationItem({ platform, action }: IntegrationItemProps) {
   return (
     <div className="flex items-center justify-between p-4 rounded-lg shadow-md bg-white">
       <span className="text-lg font-semibold">{platform}</span>
       {action === 'Connect Account' ? (
-        <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-110">
+        <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-110 ml-4">
           {action}
         </button>
       ) : (
-        <span className="text-gray-600">{action}</span>
+        <button className="bg-gray-500 text-white font-semibold py-2 px-4 rounded-full ml-4" disabled>
+          {action}
+        </button>
       )}
     </div>
   );
