@@ -1,8 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { useState, useEffect } from 'react'
-import { FileText, Settings, User } from 'lucide-react'
+import { FileText, Settings } from 'lucide-react'
+import useSWR from 'swr'
 import {
   Sidebar,
   SidebarContent,
@@ -24,28 +24,24 @@ interface UserData {
   // Add other user data fields as needed
 }
 
+// Create a fetcher function
+const fetcher = async (url: string) => {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error('Failed to fetch user data')
+  return res.json()
+}
+
 export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch('/api/user');
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-        const data = await response.json();
-        setUserData(data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  const { data: userData, error, isLoading } = useSWR<UserData>(
+    '/api/user', 
+    fetcher,
+    {
+      revalidateOnFocus: false, // Don't revalidate on window focus
+      revalidateOnReconnect: false, // Don't revalidate on reconnection
+      refreshInterval: 5 * 60 * 1000, // Refresh every 5 minutes
+      dedupingInterval: 2000, // Dedupe requests within 2 seconds
+    }
+  );
 
   const handleNavigation = (path: string) => {
     window.location.href = path;
@@ -55,8 +51,10 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
     <Sidebar className="border-r">
       <SidebarHeader className="border-b px-6 py-4">
         <h2 className="text-lg font-semibold text-orange-500">
-          {loading ? (
-            'Loading...'
+          {isLoading ? (
+            'Dashboard'
+          ) : error ? (
+            'Dashboard'
           ) : userData?.first_name ? (
             `Hey, ${userData.first_name}!`
           ) : (
