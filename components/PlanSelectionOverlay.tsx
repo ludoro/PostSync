@@ -15,36 +15,27 @@ const PlanSelectionOverlay = ({ onSelectPlan }: { onSelectPlan: (plan: Plan) => 
     {
       name: 'Starter',
       price: '$9',
-      description: 'Perfect for individuals and small teams',
+      description: 'Perfect if you are just starting out :)',
       features: [
-        'Up to 10 scheduled posts',
-        'Basic analytics',
-        'Single social account',
-        '24/7 support'
+        'Up to 30 scheduled posts per month',
+      ]
+    },
+    {
+      name: 'Advanced',
+      price: '$29',
+      description: 'For tech creators looking to scale :)',
+      features: [
+        'Up to 100 scheduled posts per month',
       ]
     },
     {
       name: 'Pro',
-      price: '$29',
-      description: 'Best for growing businesses',
+      price: '$49',
+      description: 'You know your stuff!',
       features: [
-        'Unlimited scheduled posts',
-        'Advanced analytics',
-        'Up to 5 social accounts',
-        'Priority support',
-        'Custom scheduling'
-      ]
-    },
-    {
-      name: 'Enterprise',
-      price: '$99',
-      description: 'For large organizations',
-      features: [
-        'Everything in Pro',
-        'Unlimited social accounts',
-        'Team collaboration',
-        'API access',
-        'Custom solutions'
+        'Unlimited posts',
+        'Get help to improve your posts using AI (unlimited)',
+        'Generate images for your posts using AI (up to 30 images a month)'
       ]
     }
   ];
