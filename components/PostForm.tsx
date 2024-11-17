@@ -1,13 +1,11 @@
 import * as React from 'react'
 import { Calendar, Image, Clock, X } from 'lucide-react'
-import { format } from 'date-fns'
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -19,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -83,7 +80,7 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
                 <Label>Publishing Schedule</Label>
                 <p className="text-sm text-gray-500 mb-2">
                   {!date ? "Set a date and time to schedule for later. If not, the post will be published immediately." 
-                        : `Scheduled for ${format(date, "PPP")} at ${time}`}
+                        : `Scheduled for ${date.toLocaleDateString()} at ${time}`}
                 </p>
                 <div className="flex space-x-2">
                   <Popover>
@@ -96,7 +93,7 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
                         )}
                       >
                         <Calendar className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP") : <span>Pick a date</span>}
+                        {date ? date.toLocaleDateString() : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">

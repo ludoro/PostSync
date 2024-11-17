@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { FileText, Settings } from 'lucide-react'
-import useSWR from 'swr'
 import {
   Sidebar,
   SidebarContent,
@@ -19,23 +18,7 @@ interface MainSidebarProps {
   currentPath?: string;
 }
 
-interface UserData {
-  first_name: string;
-  // Add other user data fields as needed
-}
-
-// Create a fetcher function
-const fetcher = async (url: string) => {
-  const res = await fetch(url)
-  if (!res.ok) throw new Error('Failed to fetch user data')
-  return res.json()
-}
-
 export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
-  const { data: userData, isLoading } = useSWR<UserData>(
-    '/api/user', 
-    fetcher,
-  );
 
   const handleNavigation = (path: string) => {
     window.location.href = path;
@@ -46,7 +29,7 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
     <Sidebar className="border-r">
       <SidebarHeader className="border-b px-6 py-4">
         <h2 className="text-lg font-semibold text-orange-500">
-        {isLoading ? 'Dashboard' : `Hey ${userData?.first_name}!`}
+        Let's post some content!
         </h2>
       </SidebarHeader>
       <SidebarContent>

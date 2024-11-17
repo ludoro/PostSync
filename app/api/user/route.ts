@@ -32,7 +32,7 @@ export async function GET() {
     // Query Supabase for user data
     const { data, error } = await supabase
       .from('users')
-      .select('first_name, email, id')  // Be explicit about what we're selecting
+      .select('first_name, email, id, scheduled_posts, plan, plan_last_updated')  // Be explicit about what we're selecting
       .eq('id', userId)
       .single()
 
