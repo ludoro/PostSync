@@ -32,34 +32,21 @@ const fetcher = async (url: string) => {
 }
 
 export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
-  const { data: userData, error, isLoading } = useSWR<UserData>(
+  const { data: userData, isLoading } = useSWR<UserData>(
     '/api/user', 
     fetcher,
-    {
-      revalidateOnFocus: false, // Don't revalidate on window focus
-      revalidateOnReconnect: false, // Don't revalidate on reconnection
-      refreshInterval: 5 * 60 * 1000, // Refresh every 5 minutes
-      dedupingInterval: 2000, // Dedupe requests within 2 seconds
-    }
   );
 
   const handleNavigation = (path: string) => {
     window.location.href = path;
   };
 
+
   return (
     <Sidebar className="border-r">
       <SidebarHeader className="border-b px-6 py-4">
         <h2 className="text-lg font-semibold text-orange-500">
-          {isLoading ? (
-            'Dashboard'
-          ) : error ? (
-            'Dashboard'
-          ) : userData?.first_name ? (
-            `Hey, ${userData.first_name}!`
-          ) : (
-            'Dashboard'
-          )}
+        {isLoading ? 'Dashboard' : `Hey ${userData?.first_name}!`}
         </h2>
       </SidebarHeader>
       <SidebarContent>

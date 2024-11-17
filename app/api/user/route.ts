@@ -1,6 +1,6 @@
 // app/api/user/route.ts
 import { createClient } from '@supabase/supabase-js'
-import { getAuth } from '@clerk/nextjs/server'
+import { currentUser } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 
@@ -13,9 +13,10 @@ if (!supabaseUrl || !supabaseServiceKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const { userId } = getAuth(req)
+    const user = await currentUser()
+    const userId = user?.id
     
     // Debug logs
     console.log('Processing request for userId:', userId)
