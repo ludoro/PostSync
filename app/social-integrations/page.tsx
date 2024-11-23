@@ -12,24 +12,55 @@ interface UserData {
 export default function SocialIntegrationsPage() {
   const [userData, setUserData] = React.useState<UserData | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isDisconnecting, setIsDisconnecting] = React.useState(false);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('/api/is_linkedin_connected');
+      if (!response.ok) {
+        if (response.status === 500) {
+          // If no connection exists, set userData to null
+          setUserData(null);
+          return;
+        }
+        throw new Error('Failed to fetch user data');
+      }
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error(error);
+      setUserData(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   React.useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch('/api/is_linkedin_connected');
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-        const data = await response.json();
-        setUserData(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchUserData();
   }, []);
+
+  const handleDisconnect = async () => {
+    if (isDisconnecting) return;
+    
+    try {
+      setIsDisconnecting(true);
+      const response = await fetch('/api/auth/linkedin/disconnect', {
+        method: 'POST'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to disconnect');
+      }
+      
+      // Immediately set userData to null to show "Connect Account"
+      setUserData(null);
+      
+    } catch (error) {
+      console.error('Error disconnecting:', error);
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
 
   const searchParams = useSearchParams();
   const status = searchParams.get('status');
@@ -72,8 +103,18 @@ export default function SocialIntegrationsPage() {
                   <span className="text-sm text-gray-500">
                     Expires: {new Date(userData!.expires_at!).toLocaleDateString()}
                   </span>
-                  <button className="bg-green-500 text-white font-semibold py-2 px-4 rounded-full" disabled>
+                  <button 
+                    className="bg-green-500 text-white font-semibold py-2 px-4 rounded-full" 
+                    disabled
+                  >
                     Connected
+                  </button>
+                  <button 
+                    className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-full transition-colors"
+                    onClick={handleDisconnect}
+                    disabled={isDisconnecting}
+                  >
+                    {isDisconnecting ? 'Disconnecting...' : 'Disconnect'}
                   </button>
                 </div>
               ) : (
