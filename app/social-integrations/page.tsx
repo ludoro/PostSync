@@ -125,7 +125,6 @@ export default function SocialIntegrationsPage() {
             {/* Other Integration Items */}
             <IntegrationItem platform="Twitter" action="Coming Soon" />
             <IntegrationItem platform="YouTube" action="Coming Soon" />
-            <IntegrationItem platform="TikTok" action="Coming Soon" />
           </div>
         </main>
       </div>

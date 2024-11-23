@@ -9,7 +9,6 @@ interface UserData {
   plan: string;
   plan_last_updated: string;
   scheduled_posts: number;
-  // Add other user data fields as needed
 }
 
 export default function Page() {
@@ -38,90 +37,87 @@ export default function Page() {
     <SidebarProvider>
       <div className="grid h-screen grid-cols-[280px_1fr]">
         {/* Sidebar */}
-        <MainSidebar currentPath="/manage-plan"/>
+        <MainSidebar currentPath="/manage-plan" />
 
         {/* Main Content */}
-        <main className="p-6 overflow-auto">
-          <h2 className="text-2xl font-semibold mb-6">Manage Your Plan</h2>
+        <main className="p-6 overflow-auto bg-white">
+          <h2 className="text-3xl font-bold mb-8 text-gray-800">Manage Your Plan</h2>
 
           {isLoading ? (
             <div className="flex justify-center items-center h-full">
-              <span>Loading...</span>
+              <span className="text-lg font-medium text-gray-600">Loading...</span>
             </div>
           ) : (
-            <div className="bg-white shadow rounded-lg p-6">
-              <div className="divide-y divide-gray-200 space-y-4">
+            <div className="bg-white shadow-lg rounded-lg p-8">
+              <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <span>Account Type</span>
-                  <span className="font-semibold">{userData?.plan || 'N/A'}</span>
+                  <span className="text-gray-500">Account Type</span>
+                  <span className="font-semibold text-gray-800">{userData?.plan || 'N/A'}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Plan last updated: </span>
-                  <span className="font-semibold">
+                  <span className="text-gray-500">Plan Last Updated</span>
+                  <span className="font-semibold text-gray-800">
                     {userData?.plan_last_updated
                       ? new Date(userData.plan_last_updated).toLocaleDateString()
                       : 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Scheduled posts this month</span>
-                  <span className="font-semibold ml-2">
-                    {userData?.scheduled_posts ? `${userData.scheduled_posts} ` : '0 '}
+                  <span className="text-gray-500">Scheduled Posts This Month</span>
+                  <span className="font-semibold text-gray-800">
+                    {userData?.scheduled_posts || 0}
                   </span>
                 </div>
               </div>
             </div>
           )}
 
-        {/* Possible Upgrades */}
-        <div className="grid grid-cols-3 gap-6 mt-6">
-          {/* Upgrade 1 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-2">Starter Plan (9$ / month)</h3>
-            <p>Up to 30 scheduled posts per month</p>
-            <button
-              className={`mt-4 ${
-                userData?.plan === 'Starter'
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 hover:bg-blue-700 text-white'
-              } font-bold py-2 px-4 rounded`}
-              disabled={userData?.plan === 'Starter'}
-            >
-              Upgrade to Starter
-            </button>
+          {/* Upgrade Options */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
+            {[
+              {
+                title: 'Starter Plan',
+                price: '$9 / month',
+                description: 'Up to 30 scheduled posts per month',
+                active: userData?.plan === 'Starter',
+                bgColor: 'bg-blue-500',
+                hoverBg: 'hover:bg-blue-700',
+              },
+              {
+                title: 'Advanced Plan',
+                price: '$29 / month',
+                description: 'Up to 100 scheduled posts per month',
+                active: userData?.plan === 'Advanced',
+                bgColor: 'bg-orange-500',
+                hoverBg: 'hover:bg-orange-700',
+              },
+              {
+                title: 'Pro Plan',
+                price: '$49 / month',
+                description: 'Unlimited posts and AI assistance',
+                active: true, // Coming soon
+                disabled: true,
+              },
+            ].map((plan, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-lg rounded-lg p-6 border border-gray-100"
+              >
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">{plan.title}</h3>
+                <p className="text-gray-500 mb-4">{plan.description}</p>
+                <button
+                  className={`w-full py-2 px-4 rounded font-medium text-white ${
+                    plan.active
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : `${plan.bgColor} ${plan.hoverBg}`
+                  }`}
+                  disabled={plan.active || plan.disabled}
+                >
+                  {plan.disabled ? 'Coming Soon' : `Upgrade to ${plan.title}`}
+                </button>
+              </div>
+            ))}
           </div>
-          {/* Upgrade 2 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-2">Advanced Plan (29$ / month)</h3>
-            <p>Up to 100 scheduled posts per month</p>
-            <button
-              className={`mt-4 ${
-                userData?.plan === 'Advanced'
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-orange-500 hover:bg-orange-700 text-white'
-              } font-bold py-2 px-4 rounded`}
-              disabled={userData?.plan === 'Advanced'}
-            >
-              Upgrade to Advanced
-            </button>
-          </div>
-          {/* Upgrade 3 */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-2">Pro Plan (49$ / month)</h3>
-            <p>Unlimited posts and AI help on posts</p>
-            <button
-              className={`mt-4 ${
-                (userData?.plan === 'Pro' || true)
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 hover:bg-blue-700 text-white'
-              } font-bold py-2 px-4 rounded`}
-              disabled={(userData?.plan === 'Pro') || true}
-            >
-              Upgrade to Pro (coming soon)
-            </button>
-          </div>
-        </div>
-
         </main>
       </div>
     </SidebarProvider>
