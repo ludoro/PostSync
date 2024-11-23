@@ -25,7 +25,7 @@ export async function GET() {
     const state = randomBytes(16).toString('hex');
 
     // Define scopes
-    const scopes = ['r_liteprofile', 'r_emailaddress'];
+    const scopes = ['w_member_social'];
 
     // Construct authorization URL
     const authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join(
