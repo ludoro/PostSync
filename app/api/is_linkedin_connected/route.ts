@@ -34,7 +34,6 @@ export async function GET() {
       .from('linkedin_connections')
       .select('expires_at')  // Be explicit about what we're selecting
       .eq('clerk_user_id', userId)
-      .single()
 
     if (error) {
       console.error('Supabase error:', error)
@@ -44,14 +43,10 @@ export async function GET() {
       )
     }
 
-    if (!data) {
-      console.log('No user found with clerk_id:', userId)
-      // If no user is found, you might want to create one
-      // This depends on your application's requirements
-      return NextResponse.json(
-        { error: 'User not found in database' },
-        { status: 404 }
-      )
+    if (!data || data.length === 0) {
+        console.log('No user found with clerk_user_id:', userId);
+        // Return a 204 No Content if no data is found
+        return new NextResponse(null, { status: 204 });
     }
 
     // Log successful response

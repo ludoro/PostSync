@@ -17,18 +17,24 @@ export default function SocialIntegrationsPage() {
   const fetchUserData = async () => {
     try {
       const response = await fetch('/api/is_linkedin_connected');
-      if (!response.ok) {
-        if (response.status === 500) {
-          // If no connection exists, set userData to null
-          setUserData(null);
-          return;
-        }
-        throw new Error('Failed to fetch user data');
+      
+      if (response.status === 204) {
+        // Handle the case where no data exists (204 No Content)
+        console.log('No data found for the user');
+        setUserData(null);
+        return;
       }
+  
+      if (!response.ok) {
+        // Handle other error statuses
+        throw new Error(`Failed to fetch user data: ${response.statusText}`);
+      }
+  
+      // Parse the response if the status is OK (e.g., 200)
       const data = await response.json();
       setUserData(data);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching user data:', error);
       setUserData(null);
     } finally {
       setIsLoading(false);
