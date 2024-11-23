@@ -42,12 +42,13 @@ export default function Dashboard() {
           />
         </main>
 
-        {/* Preview */}
-        <PostReview
+
+        {/* Don't show this for now */}
+        {false && <PostReview
           date={date}
           time={time}
           content={postContent}
-        />
+        />}
       </div>
     </SidebarProvider>
   )
