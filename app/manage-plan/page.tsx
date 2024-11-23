@@ -103,7 +103,7 @@ export default function Page() {
                 key={index}
                 className="bg-white shadow-lg rounded-lg p-6 border border-gray-100"
               >
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">{plan.title}</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">{plan.title} {plan.price}</h3>
                 <p className="text-gray-500 mb-4">{plan.description}</p>
                 <button
                   className={`w-full py-2 px-4 rounded font-medium text-white ${
