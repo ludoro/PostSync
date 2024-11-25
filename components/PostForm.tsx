@@ -73,6 +73,11 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
       }
       return combined
     })
+
+    // Clear the file input after selection, so users can upload again an image.
+    if (e.target) {
+      e.target.value = '';
+    }
   }
 
   const removeFile = (preview: string) => {
