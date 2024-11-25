@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Calendar, Image, Clock, X } from 'lucide-react'
+import { Calendar, Image, Video, Clock, X } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
@@ -38,10 +38,47 @@ interface PostFormProps {
 }
 
 type PostStatus = 'draft' | 'published';
+type FilePreview = {
+  file: File
+  preview: string
+  type: 'image' | 'video'
+}
 
 export default function PostForm({ date, setDate, time, setTime, content, setContent }: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [files, setFiles] = React.useState<FilePreview[]>([])
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const videoInputRef = React.useRef<HTMLInputElement>(null)
   const { toast } = useToast()
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
+    const selectedFiles = Array.from(e.target.files || [])
+    
+    if (type === 'video' && selectedFiles.length > 0) {
+      // Remove existing video if any
+      setFiles(prev => prev.filter(f => f.type === 'image'))
+    }
+    
+    const newFiles = selectedFiles.map(file => ({
+      file,
+      preview: URL.createObjectURL(file),
+      type
+    }))
+
+    setFiles(prev => {
+      const combined = [...prev, ...newFiles]
+      // Ensure only one video maximum
+      if (type === 'video') {
+        return [...prev.filter(f => f.type === 'image'), newFiles[0]]
+      }
+      return combined
+    })
+  }
+
+  const removeFile = (preview: string) => {
+    setFiles(prev => prev.filter(f => f.preview !== preview))
+    URL.revokeObjectURL(preview)
+  }
 
   const timeOptions = React.useMemo(() => {
     const times = [];
@@ -97,6 +134,10 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
   const resetSchedule = () => {
     setDate(undefined);
     setTime('00:00');
+  };
+
+  const resetFiles = () => {
+    setFiles([]);
   };
 
   const handleSubmit = async (status: PostStatus) => {
@@ -157,6 +198,7 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
       setContent('')
       if (status === 'published') {
         resetSchedule()
+        resetFiles()
       }
     } catch (error) {
       console.error('Error saving post:', error)
@@ -190,16 +232,72 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
                 <p className="text-sm text-gray-500 text-right">{content.length} characters</p>
               </div>
               <div className="flex flex-col space-y-4">
-                <div>
-                  <Button variant="outline" className="w-[280px]">
+                <div className="flex space-x-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleFileSelect(e, 'image')}
+                  />
+                  <input
+                    type="file"
+                    ref={videoInputRef}
+                    className="hidden"
+                    accept="video/*"
+                    onChange={(e) => handleFileSelect(e, 'video')}
+                  />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => fileInputRef.current?.click()}
+                  >
                     <Image className="mr-2 h-4 w-4" />
-                    Add Images / Videos
+                    Add Images
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => videoInputRef.current?.click()}
+                  >
+                    <Video className="mr-2 h-4 w-4" />
+                    Add Video
                   </Button>
                 </div>
+
+                {files.length > 0 && (
+                  <div className="grid grid-cols-4 gap-4">
+                    {files.map((file) => (
+                      <div key={file.preview} className="relative group">
+                        {file.type === 'image' ? (
+                          <img
+                            src={file.preview}
+                            alt="Preview"
+                            className="w-full h-24 object-cover rounded"
+                          />
+                        ) : (
+                          <video
+                            src={file.preview}
+                            className="w-full h-24 object-cover rounded"
+                          />
+                        )}
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => removeFile(file.preview)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                </div>
+              <div className="flex flex-col space-y-4">
                 <div className="space-y-2">
                   <Label>Publishing Schedule</Label>
                   <p className="text-sm text-gray-500 mb-2">
-                    {!date ? "Post will be scheduled for the next available 15-minute interval." 
+                    {!date ? "Post will be scheduled for the next available 15-minute interval if not date is set." 
                           : `Scheduled for ${date.toLocaleDateString()} at ${time}`}
                   </p>
                   <div className="flex space-x-2">
@@ -249,7 +347,7 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={resetSchedule}
+                        onClick={() => { resetSchedule(); resetFiles(); }}
                         className="text-gray-500"
                       >
                         <X className="h-4 w-4" />
@@ -267,7 +365,7 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
             onClick={() => handleSubmit('published')}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Saving..." : date ? "Schedule Post" : "Publish Now"}
+            {isSubmitting ? "Saving..." : date ? "Schedule Post" : "Publish as soon as possible"}
           </Button>
 
           <Button 
