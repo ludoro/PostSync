@@ -171,6 +171,33 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
         }
       }
 
+        // Convert files to base64
+        const filePromises = files.map(async (filePreview) => {
+          console.log("File preview:", filePreview);
+          console.log("File object:", filePreview.file);
+          console.log("File type:", filePreview.type);
+        
+          return new Promise<{ base64: string, type: 'image' | 'video' }>((resolve, reject) => {
+            if (!(filePreview.file instanceof File)) {
+              reject(new Error("Not a File object"));
+              return;
+            }
+        
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              resolve({
+                base64: reader.result as string,
+                type: filePreview.type
+              });
+            };
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(filePreview.file);
+          });
+        });
+        
+
+      const processedFiles = await Promise.all(filePromises);
+
       const response = await fetch('/api/schedule_post', {
         method: 'POST',
         headers: {
@@ -179,7 +206,9 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
         body: JSON.stringify({
           content,
           scheduledAt,
-          status
+          status,
+          files: processedFiles.map(f => f.base64),
+          fileTypes: processedFiles.map(f => f.type)
         })
       })
 

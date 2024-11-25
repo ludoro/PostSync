@@ -33,28 +33,58 @@ export async function POST(request: Request) {
     const imageUrls: string[] = []
     const videoUrls: string[] = []
 
-    // Upload files to Supabase Storage
-    if (files) {
+    if (files && Array.isArray(files) && files.length > 0) {
+      console.log("Entering files check")
       for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-        const fileType = fileTypes[i]
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${postId}_${i}.${fileExt}`
-        const filePath = `${userId}/${fileName}`
-  
+        console.log("Looping over files")
+        const fileData = files[i]
+        const fileType = fileTypes?.[i]
+    
+        console.log("fileData type:", typeof fileData)
+        console.log("fileData:", fileData)
+    
+        if (!fileData) continue; // Skip undefined files
+        console.log("File is defined")
+    
+        let file: File | Blob
+        let fileName: string
+        let fileExt: string = 'unknown'
+    
+        // Check if it's a base64 string
+        if (typeof fileData === 'string' && fileData.startsWith('data:')) {
+          console.log("Base64 string detected")
+          const match = fileData.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9]+);base64,/)
+          if (match) {
+            fileExt = match[1].split('/')[1]
+            const base64Response = await fetch(fileData)
+            file = await base64Response.blob()
+          } else {
+            console.log("Invalid base64 string")
+            continue;
+          }
+        } else {
+          console.log("Unexpected file data type")
+          continue;
+        }
+    
+        const filePath = `${userId}/${postId}_${i}.${fileExt}`
+    
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('schedule_stuff_bucket')
           .upload(filePath, file)
-  
-        if (uploadError) throw uploadError
-  
+    
+        if (uploadError) {
+          console.error('Upload error:', uploadError)
+          continue; // Skip this file but continue with others
+        }
+    
         const { data: { publicUrl } } = supabase.storage
           .from('schedule_stuff_bucket')
           .getPublicUrl(filePath)
-  
+    
         if (fileType === 'image') {
           imageUrls.push(publicUrl)
-        } else {
+        } else if (fileType === 'video') {
           videoUrls.push(publicUrl)
         }
       }
