@@ -10,8 +10,9 @@ export default function Page() {
       <header className="w-full border-b bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <nav className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
-              <span className="text-xl font-medium">SocialSync</span>
+            <div className="flex items-center space-x-2">
+              <Image src="/favicon.ico" alt="LinkedPulse Logo" width={30} height={30} />
+              <span className="text-xl font-medium">LinkedPulse</span>
             </div>
             
             <div className="hidden items-center space-x-8 md:flex">
@@ -26,7 +27,7 @@ export default function Page() {
               </Link>
             </div>
 
-            <Button variant="default" className="bg-orange-500 hover:bg-orange-600 text-white">
+            <Button variant="default" className="bg-blue-500 hover:bg-blue-600 text-white">
               <Link href="/sign-in" className="text-white">Login</Link>
             </Button>
           </nav>
@@ -40,7 +41,7 @@ export default function Page() {
             <div className="flex flex-col space-y-8">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
                 Scheduling posts should not be expensive and hard.{" "}
-                <span className="italic text-orange-500">It should just work.</span>
+                <span className="italic text-blue-500">It should just work.</span>
               </h1>
               
               <p className="text-xl text-gray-600">
@@ -56,14 +57,14 @@ export default function Page() {
                   "Save time!",
                 ].map((feature) => (
                   <div key={feature} className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-orange-500 flex-shrink-0" />
+                    <CheckCircle2 className="h-5 w-5 text-blue-500 flex-shrink-0" />
                     <span className="text-gray-700">{feature}</span>
                   </div>
                 ))}
               </div>
 
               <div className="space-y-4">
-                <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white px-8">
+                <Button size="lg" className="bg-blue-500 hover:bg-blue-600 text-white px-8">
                   Try it for free
                 </Button>
               </div>

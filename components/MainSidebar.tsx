@@ -28,8 +28,11 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
   return (
     <Sidebar className="border-r">
       <SidebarHeader className="border-b px-6 py-4">
-        <h2 className="text-lg font-semibold text-orange-500">
-        Let's post some content!
+        <h2 className="text-lg font-semibold text-blue-500">
+        <div className="flex items-center space-x-2">
+              <img src="/favicon.ico" alt="LinkedPulse Logo" width={30} height={30} />
+              <span className="text-xl font-medium">LinkedPulse</span>
+        </div>
         </h2>
       </SidebarHeader>
       <SidebarContent>
@@ -41,7 +44,7 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                     onClick={() => handleNavigation('/dashboard')}
-                    className={currentPath === '/dashboard' ? 'bg-orange-100' : ''}
+                    className={currentPath === '/dashboard' ? 'bg-blue-100' : ''}
                   >
                     Write a new post
                   </SidebarMenuButton>
@@ -49,7 +52,7 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                     onClick={() => handleNavigation('/scheduled-posts')}
-                    className={currentPath === '/scheduled-posts' ? 'bg-orange-100' : ''}
+                    className={currentPath === '/scheduled-posts' ? 'bg-blue-100' : ''}
                   >
                     Scheduled posts
                   </SidebarMenuButton>
@@ -57,7 +60,7 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                     onClick={() => handleNavigation('/draft-posts')}
-                    className={currentPath === '/draft-posts' ? 'bg-orange-100' : ''}
+                    className={currentPath === '/draft-posts' ? 'bg-blue-100' : ''}
                   >
                     Draft posts
                   </SidebarMenuButton>
@@ -74,7 +77,7 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                     onClick={() => handleNavigation('/manage-plan')}
-                    className={currentPath === '/manage-plan' ? 'bg-orange-100' : ''}
+                    className={currentPath === '/manage-plan' ? 'bg-blue-100' : ''}
                   >
                     Manage your plan
                   </SidebarMenuButton>
@@ -82,7 +85,7 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                     onClick={() => handleNavigation('/social-integrations')}
-                    className={currentPath === '/social-integrations' ? 'bg-orange-100' : ''}
+                    className={currentPath === '/social-integrations' ? 'bg-blue-100' : ''}
                   >
                     Social integrations
                   </SidebarMenuButton>

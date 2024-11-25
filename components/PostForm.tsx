@@ -395,7 +395,7 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button 
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="bg-blue-500 hover:bg-blue-600 text-white"
             onClick={() => handleSubmit('published')}
             disabled={isSubmitting}
           >

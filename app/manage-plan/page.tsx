@@ -88,8 +88,8 @@ export default function Page() {
                 price: '$29 / month',
                 description: 'Up to 100 scheduled posts per month',
                 active: userData?.plan === 'Advanced',
-                bgColor: 'bg-orange-500',
-                hoverBg: 'hover:bg-orange-700',
+                bgColor: 'bg-blue-500',
+                hoverBg: 'hover:bg-blue-700',
               },
               {
                 title: 'Pro Plan',
