@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const postId = userId + Math.random().toString(36)
+    const postId = userId + '_' + Math.random().toString(36).replace(/\./, '')
     const imageUrls: string[] = []
     const videoUrls: string[] = []
 
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
           continue;
         }
     
-        const filePath = `${userId}/${postId}_${i}.${fileExt}`
+        const filePath = `files/${postId}_${i}.${fileExt}`
     
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('schedule_stuff_bucket')
