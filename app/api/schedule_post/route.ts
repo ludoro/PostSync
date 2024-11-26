@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const postId = userId + '_' + Math.random().toString(36).replace(/\./, '')
+    const postId = 'postid_' + Math.random().toString(36).replace(/\./, '')
     const imageUrls: string[] = []
     const videoUrls: string[] = []
 
