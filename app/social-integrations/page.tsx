@@ -14,6 +14,16 @@ export default function SocialIntegrationsPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isDisconnecting, setIsDisconnecting] = React.useState(false);
 
+
+  const handleConnect = async () => {
+    console.log("Handle connection")
+    try {
+      window.location.href = '/api/auth/linkedin';
+    } catch (error) {
+      console.error('Error initiating LinkedIn connection:', error);
+    }
+  };
+
   const fetchUserData = async () => {
     try {
       const response = await fetch('/api/is_linkedin_connected');
@@ -117,7 +127,7 @@ export default function SocialIntegrationsPage() {
                       </span>
                       <button
                         className="bg-green-500 text-white font-semibold py-2 px-4 rounded-full hover:bg-green-600 transition-colors duration-300"
-                        onClick={() => {} /* Trigger connect action if needed */}
+                        onClick={handleConnect}
                       >
                         Update access
                       </button>
