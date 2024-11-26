@@ -14,19 +14,6 @@ export default function Page() {
               <Image src="/favicon.ico" alt="LinkedPulse Logo" width={30} height={30} />
               <span className="text-xl font-medium">LinkedPulse</span>
             </div>
-            
-            <div className="hidden items-center space-x-8 md:flex">
-              <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
-                Pricing
-              </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
-                Features
-              </Link>
-              <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
-                Platforms
-              </Link>
-            </div>
-
             <Button variant="default" className="bg-blue-500 hover:bg-blue-600 text-white">
               <Link href="/sign-in" className="text-white">Login</Link>
             </Button>
