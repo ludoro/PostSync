@@ -10,12 +10,21 @@ const supabase = createClient(
 export async function POST(request: Request) {
   try {
     const json = await request.json()
-    const { content, scheduledAt, status, files, fileTypes } = json
-    
+    const { existing_id, content, scheduledAt, status, files, fileTypes } = json
+    console.log("Scheduling post?")
+
     if (!content?.trim()) {
       return NextResponse.json(
         { message: 'Content is required' },
         { status: 400 }
+      )
+    }
+
+    if (existing_id) {
+      console.log("Already have ID")
+      return NextResponse.json(
+        { message: 'Post draft is updated already with put message' },
+        { status: 200 }
       )
     }
 
@@ -90,22 +99,26 @@ export async function POST(request: Request) {
       }
     }
 
-    // Insert into Supabase database
+
+    const actualPostId = existing_id ? existing_id : postId;
+
+    // Data to be inserted or updated
+    const postData = {
+      post_id: actualPostId,
+      clerk_user_id: userId,
+      content,
+      scheduled_at: scheduledAt,
+      status: scheduledAt ? 'scheduled' : 'draft',
+      created_at: new Date().toISOString(),
+      image_urls: imageUrls,
+      video_urls: videoUrls,
+    };
+    
+    // Insert or update the post in Supabase
     const { data, error } = await supabase
       .from('posts')
-      .insert([
-        {
-          post_id: postId,
-          clerk_user_id: userId,
-          content,
-          scheduled_at: scheduledAt,
-          status: scheduledAt ? 'scheduled' : 'draft',
-          created_at: new Date().toISOString(),
-          image_urls: imageUrls,
-          video_urls: videoUrls,
-        }
-      ])
-      .select()
+      .upsert([postData], { onConflict: 'post_id' })  // Define the conflict column for upsert
+      .select();
 
     if (error) {
       console.error('Error inserting post:', error)

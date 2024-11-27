@@ -29,6 +29,7 @@ import { Toaster } from "@/components/ui/toaster"
 import confetti from 'canvas-confetti';
 
 interface PostFormProps {
+  existingPostId: string | null | undefined;
   date?: Date;
   setDate: (date?: Date) => void;
   time: string;
@@ -44,13 +45,13 @@ type FilePreview = {
   type: 'image' | 'video'
 }
 
-export default function PostForm({ date, setDate, time, setTime, content, setContent }: PostFormProps) {
+export default function PostForm({ existingPostId, date, setDate, time, setTime, content, setContent }: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [files, setFiles] = React.useState<FilePreview[]>([])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const videoInputRef = React.useRef<HTMLInputElement>(null)
   const { toast } = useToast()
-
+  console.log("PRINT EXISTING POST ID: ")
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const selectedFiles = Array.from(e.target.files || [])
     
@@ -146,6 +147,7 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
   };
 
   const handleSubmit = async (status: PostStatus) => {
+
     if (!content.trim()) {
       toast({
         variant: "destructive",
@@ -197,13 +199,15 @@ export default function PostForm({ date, setDate, time, setTime, content, setCon
         
 
       const processedFiles = await Promise.all(filePromises);
-
+      console.log("Before scheduling post")
+      console.log(existingPostId)
       const response = await fetch('/api/schedule_post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          existing_id: existingPostId, // Changed from existingPostId to existing_id
           content,
           scheduledAt,
           status,
