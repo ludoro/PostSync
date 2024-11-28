@@ -21,15 +21,17 @@ export default function EditDraft() {
     const router = useRouter()
     const params = useParams() // Use useParams instead of props
     const existingPostId = typeof params?.id === 'string' ? params.id : '';
-    console.log("AAAA")
-    console.log(params.id)
-    console.log(existingPostId)
 
     useEffect(() => {
         const fetchDraft = async () => {
+            const origin = sessionStorage.getItem('edit-draft-origin')
+            const apiEndpoint = origin === 'scheduled-posts' 
+            ? `/api/scheduled_posts_id/${params.id}` 
+            : `/api/draft_posts_id/${params.id}`;
+
             if (!params?.id) return
             try {
-                const response = await fetch(`/api/draft_posts_id/${params.id}`)
+                const response = await fetch(apiEndpoint)
                 if (!response.ok) throw new Error('Failed to fetch draft')
                 const data: DraftPost = await response.json()
                 setDraft(data)
@@ -43,23 +45,6 @@ export default function EditDraft() {
 
         fetchDraft()
     }, [params?.id, router])
-
-    const handleSave = async (updatedData: Partial<DraftPost>) => {
-        try {
-            const response = await fetch(`/api/draft_posts/${params.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedData),
-            })
-            if (!response.ok) throw new Error('Failed to update draft')
-
-            router.push('/draft-posts') // Redirect to draft list after saving
-        } catch (error) {
-            console.error(error)
-        }
-    }
 
     if (loading) {
         return <p>Loading...</p>
@@ -79,7 +64,7 @@ export default function EditDraft() {
                 <main className="p-6 overflow-auto">
                     <h2 className="text-2xl font-bold mb-6">Edit Draft</h2>
                     <PostForm
-                          existingPostId={existingPostId || ''}
+                        existingPostId={existingPostId || ''}
                         content={draft?.content || ''}
                         setContent={(content) =>
                             setDraft((prev) =>

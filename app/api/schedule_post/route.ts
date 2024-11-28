@@ -20,14 +20,6 @@ export async function POST(request: Request) {
       )
     }
 
-    if (existing_id) {
-      console.log("Already have ID")
-      return NextResponse.json(
-        { message: 'Post draft is updated already with put message' },
-        { status: 200 }
-      )
-    }
-
     const user = await currentUser()
     const userId = user?.id
 
@@ -133,11 +125,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-}
-
-// Update content-type configuration for the route
-export const config = {
-  api: {
-    bodyParser: false,
-  },
 }

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Calendar, Image, Video, Clock, X } from 'lucide-react'
 import { cn } from "@/lib/utils"
+import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import {
@@ -46,6 +47,7 @@ type FilePreview = {
 }
 
 export default function PostForm({ existingPostId, date, setDate, time, setTime, content, setContent }: PostFormProps) {
+  const router = useRouter()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [files, setFiles] = React.useState<FilePreview[]>([])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -238,6 +240,22 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
         resetSchedule()
         resetFiles()
       }
+      // Create a toast with a clear message about redirection
+      const redirectToast = toast({
+        title: "✨ Success!",
+        description: status === 'published' 
+          ? `Post scheduled for ${scheduledAt!.toLocaleDateString()} at ${formatTimeForSelect(scheduledAt!)}. Redirecting to dashboard...`
+          : "Draft saved. Redirecting to dashboard...",
+        duration: 2000, // Show for 2 seconds
+        className: "bg-green-50 border-green-200"
+      })
+
+      // Wait for the toast to be visible
+      await new Promise(resolve => setTimeout(resolve, 2000))
+
+      // Close the toast and redirect
+      redirectToast.dismiss()
+      router.push('/dashboard')
     } catch (error) {
       console.error('Error saving post:', error)
       toast({

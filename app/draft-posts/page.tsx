@@ -26,7 +26,8 @@ export default function Page() {
     }, [])
 
     const handleEdit = (id: string) => {
-        router.push(`/edit-draft/${id}`) // Navigate to edit page
+        sessionStorage.setItem('edit-draft-origin', 'draft-posts')
+        router.push(`/edit-draft/${id}`)
     }
 
     return (
