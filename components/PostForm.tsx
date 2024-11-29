@@ -39,7 +39,7 @@ interface PostFormProps {
   setContent: (content: string) => void;
 }
 
-type PostStatus = 'draft' | 'published';
+type PostStatus = 'draft' | 'scheduled';
 type FilePreview = {
   file: File
   preview: string
@@ -163,7 +163,7 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
     try {
       let scheduledAt: Date | null = null;
       
-      if (status === 'published') {
+      if (status === 'scheduled') {
         if (date) {
           // Use selected date and time
           const [hours, minutes] = time.split(':')
@@ -223,27 +223,27 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
         throw new Error(error.message || 'Failed to save post')
       }
 
-      if (status === 'published') {
+      if (status === 'scheduled') {
         triggerConfetti()
       }
 
       toast({
-        title: status === 'published' ? "🎉 Success!" : "✓ Saved",
-        description: status === 'published' 
+        title: status === 'scheduled' ? "🎉 Success!" : "✓ Saved",
+        description: status === 'scheduled' 
           ? `Your post has been scheduled for ${scheduledAt!.toLocaleDateString()} at ${formatTimeForSelect(scheduledAt!)}`
           : "Your post has been saved as a draft",
-        className: status === 'published' ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200",
+        className: status === 'scheduled' ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200",
       })
 
       setContent('')
-      if (status === 'published') {
+      if (status === 'scheduled') {
         resetSchedule()
         resetFiles()
       }
       // Create a toast with a clear message about redirection
       const redirectToast = toast({
         title: "✨ Success!",
-        description: status === 'published' 
+        description: status === 'scheduled' 
           ? `Post scheduled for ${scheduledAt!.toLocaleDateString()} at ${formatTimeForSelect(scheduledAt!)}. Redirecting to dashboard...`
           : "Draft saved. Redirecting to dashboard...",
         duration: 2000, // Show for 2 seconds
@@ -418,7 +418,7 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
         <CardFooter className="flex justify-between">
           <Button 
             className="bg-blue-500 hover:bg-blue-600 text-white"
-            onClick={() => handleSubmit('published')}
+            onClick={() => handleSubmit('scheduled')}
             disabled={isSubmitting}
           >
             {isSubmitting ? "Saving..." : date ? "Schedule Post" : "Publish as soon as possible"}

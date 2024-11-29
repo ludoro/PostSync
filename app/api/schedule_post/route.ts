@@ -91,8 +91,10 @@ export async function POST(request: Request) {
       }
     }
 
-
     const actualPostId = existing_id ? existing_id : postId;
+
+    // Determine the final status based on the input
+    const finalStatus = status === 'published' && scheduledAt ? 'scheduled' : status;
 
     // Data to be inserted or updated
     const postData = {
@@ -100,7 +102,7 @@ export async function POST(request: Request) {
       clerk_user_id: userId,
       content,
       scheduled_at: scheduledAt,
-      status: scheduledAt ? 'scheduled' : 'draft',
+      status: finalStatus, // Use the determined status
       created_at: new Date().toISOString(),
       image_urls: imageUrls,
       video_urls: videoUrls,
