@@ -77,7 +77,7 @@ export default function EditDraft() {
                                 prev ? { ...prev, date: date?.toISOString() || null } : null
                             )
                         }
-                        time={draft?.time || ''}
+                        time={draft?.time || '12:00'}
                         setTime={(time) =>
                             setDraft((prev) =>
                                 prev ? { ...prev, time } : null
