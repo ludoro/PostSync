@@ -144,7 +144,7 @@ export default function Page() {
                                     key={post.id}
                                     className="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                                 >
-                                    <p className="text-black font-bold mb-2">Scheduled Post</p>
+                                    <p className="text-black font-bold mb-2">Content</p>
                                     <p className="text-gray-600 text-sm">
                                         {post.content.length > 100
                                             ? post.content.substring(0, 100) + '...'
