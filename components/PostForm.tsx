@@ -325,7 +325,6 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
     <>
       <Card>
         <CardHeader>
-          <CardTitle>New Post</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={(e) => e.preventDefault()}>
