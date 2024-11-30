@@ -13,6 +13,8 @@ interface DraftPost {
     content: string
     date?: string | null
     time?: string | null
+    image_urls?: string[] | null
+    video_urls?: string[] | null
 }
 
 export default function EditDraft() {

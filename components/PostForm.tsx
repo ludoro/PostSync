@@ -37,6 +37,8 @@ interface PostFormProps {
   setTime: (time: string) => void;
   content: string;
   setContent: (content: string) => void;
+  image_urls?: string[];
+  video_urls?: string[];
 }
 
 type PostStatus = 'draft' | 'scheduled' | 'published';
@@ -46,7 +48,7 @@ type FilePreview = {
   type: 'image' | 'video'
 }
 
-export default function PostForm({ existingPostId, date, setDate, time, setTime, content, setContent }: PostFormProps) {
+export default function PostForm({ existingPostId, date, setDate, time, setTime, content, setContent, image_urls, video_urls}: PostFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [files, setFiles] = React.useState<FilePreview[]>([])
@@ -55,7 +57,7 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
   const { toast } = useToast()
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const selectedFiles = Array.from(e.target.files || [])
-    
+
     if (type === 'video' && selectedFiles.length > 0) {
       // Remove existing video if any
       setFiles(prev => prev.filter(f => f.type === 'image'))
@@ -368,7 +370,7 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
                     onClick={() => videoInputRef.current?.click()}
                   >
                     <Video className="mr-2 h-4 w-4" />
-                    Add Video
+                    Add Video (only one per post)
                   </Button>
                 </div>
 
