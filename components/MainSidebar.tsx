@@ -57,14 +57,6 @@ export function MainSidebar({ currentPath = '' }: MainSidebarProps) {
                     Scheduled posts
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton 
-                    onClick={() => handleNavigation('/draft-posts')}
-                    className={currentPath === '/draft-posts' ? 'bg-blue-100' : ''}
-                  >
-                    Draft posts
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarMenu>
           </SidebarGroupContent>

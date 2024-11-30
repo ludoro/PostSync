@@ -506,14 +506,6 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
           >
             {isSubmitting ? "Saving..." : date ? "Schedule Post" : "Publish as soon as possible"}
           </Button>
-
-          <Button 
-            className="bg-gray-500 hover:bg-gray-600 text-white"
-            onClick={() => handleSubmit('draft')}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Saving..." : "Save as draft"}
-          </Button>
         </CardFooter>
       </Card>
       <Toaster />

@@ -10,6 +10,8 @@ interface ScheduledPost {
     title: string
     content: string
     scheduledAt: string // Keep this as a string since it's JSON-parsed
+    image_urls?: string[]
+    video_urls?: string[]
 }
 
 export default function Page() {
