@@ -2,17 +2,22 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 
-interface DraftPost {
+// Define the type for draft posts
+interface Post {
     id: string
     title: string
     content: string
+    scheduledAt: string // Keep this as a string since it's JSON-parsed
+    image_url?: string[]
+    video_url?: string[]
 }
 
+
 interface EditDraftOverlayProps {
-  post: DraftPost
+  post: Post
   isOpen: boolean
   onClose: () => void
-  onSave: (updatedPost: DraftPost) => Promise<void>
+  onSave: (updatedPost: Post) => Promise<void>
 }
 
 export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({ 

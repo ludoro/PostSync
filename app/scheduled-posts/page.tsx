@@ -3,9 +3,12 @@ import { MainSidebar } from '@/components/MainSidebar'
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { EditDraftOverlay } from '@/components/EditDraftOverlay'
+import { useToast } from "@/hooks/use-toast"
+import { Toaster } from "@/components/ui/toaster"
 
 // Define the type for draft posts
-interface ScheduledPost {
+interface Post {
     id: string
     title: string
     content: string
@@ -15,9 +18,16 @@ interface ScheduledPost {
 }
 
 export default function Page() {
-    const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([])
+    const [scheduledPosts, setScheduledPosts] = useState<Post[]>([])
+    const [isEditOverlayOpen, setIsEditOverlayOpen] = useState(false)
+    const [selectedPost, setSelectedPost] = useState<Post | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+
+    const { toast } = useToast()
+
 
     // Utility to format date to user's timezone
     const formatDateToUserTimezone = (utcDate: string) => {
@@ -32,19 +42,84 @@ export default function Page() {
         }).format(new Date(utcDate))
     }
 
-    useEffect(() => {
-        const fetchScheduledPosts = async () => {
+    // Fetch scheduled posts
+    const fetchScheduledPosts = async () => {
+        setIsLoading(true)
+        try {
             const response = await fetch('/api/scheduled_posts')
-            const data: ScheduledPost[] = await response.json()
+            if (!response.ok) {
+                throw new Error('Failed to fetch scheduled posts')
+            }
+            const data: Post[] = await response.json()
             setScheduledPosts(data)
+        } catch (error) {
+            console.error('Error fetching scheduled posts:', error)
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to load scheduled post"
+              })
+        } finally {
+            setIsLoading(false)
         }
+    }
 
+    useEffect(() => {
         fetchScheduledPosts()
     }, [])
 
-    const handleEdit = (id: string) => {
-        sessionStorage.setItem('edit-draft-origin', 'scheduled-posts')
-        router.push(`/edit-draft/${id}`)
+    // Handle edit of a post
+    const handleEdit = (post: Post) => {
+        setSelectedPost(post)
+        setIsEditOverlayOpen(true)
+    }
+
+    // Handle saving an edited post
+    const handleSave = async (updatedPost: Post) => {
+        try {
+            const response = await fetch(`/api/scheduled_posts/${updatedPost.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedPost)
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.error || 'Failed to update post')
+            }
+
+            const savedPost = await response.json()
+
+            // Update the posts in state
+            setScheduledPosts(currentPosts => 
+                currentPosts.map(p => p.id === savedPost.id ? savedPost : p)
+            )
+
+            // Close the edit overlay
+            setIsEditOverlayOpen(false)
+
+            // Show success toast
+            const redirectToast = toast({
+                title: "✨ Success!",
+                description: "Post has been updated successfully!",
+                duration: 2000, // Show for 2 seconds
+                className: "bg-green-50 border-green-200"
+              })
+                  // Wait for the toast to be visible
+            await new Promise(resolve => setTimeout(resolve, 2000))
+
+            // Close the toast and redirect
+            redirectToast.dismiss()
+        } catch (error) {
+            console.error('Error saving post:', error)
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to save post"
+              })
+        }
     }
 
     return (
@@ -57,7 +132,11 @@ export default function Page() {
                 <main className="p-6 overflow-auto">
                     <h2 className="text-2xl font-bold mb-6">Scheduled Posts</h2>
 
-                    {scheduledPosts.length === 0 ? (
+                    {isLoading ? (
+                        <div className="flex justify-center items-center">
+                            <span>Loading scheduled posts...</span>
+                        </div>
+                    ) : scheduledPosts.length === 0 ? (
                         <p className="text-gray-500">No Scheduled posts available.</p>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -79,7 +158,7 @@ export default function Page() {
                                         <strong>Scheduled At:</strong> {formatDateToUserTimezone(post.scheduledAt)}
                                     </p>
                                     <button
-                                        onClick={() => handleEdit(post.id)}
+                                        onClick={() => handleEdit(post)}
                                         className="mt-4 bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700 transition"
                                     >
                                         Edit scheduled post
@@ -90,6 +169,14 @@ export default function Page() {
                     )}
                 </main>
             </div>
+            {isEditOverlayOpen && selectedPost && (
+                <EditDraftOverlay
+                    post={selectedPost}
+                    isOpen={isEditOverlayOpen}
+                    onClose={() => setIsEditOverlayOpen(false)}
+                    onSave={handleSave}
+                />
+            )}
         </SidebarProvider>
     )
 }

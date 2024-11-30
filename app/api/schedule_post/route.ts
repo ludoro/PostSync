@@ -31,10 +31,8 @@ export async function POST(request: Request) {
     }
 
     const postId = 'postid_' + Math.random().toString(36).replace(/\./, '')
-    const actualPostId = existing_id ? existing_id : postId;
-
-    const imageUrls: string[] = []
-    const videoUrls: string[] = []
+    let imageUrl: string = "";
+    let videoUrl: string = "";
 
     if (files && Array.isArray(files) && files.length > 0) {
       for (let i = 0; i < files.length; i++) {
@@ -77,29 +75,8 @@ export async function POST(request: Request) {
           continue;
         }
     
-        const filePath = `files/${actualPostId}_${i}.${fileExt}`
-        
-        
-        console.log(filePath)
-        const { data: existingFileData, error: checkError } = await supabase.storage
-        .from('schedule_stuff_bucket')
-        .list('', { 
-          search: `files/${actualPostId}_${i}.` 
-        });
-        
-        console.log(existingFileData)
+        const filePath = `files/${postId}_${i}.${fileExt}`
 
-
-        if (checkError) {
-          console.error('Error checking file existence:', checkError);
-          continue; // Skip this file if there's an error checking
-        }
-
-        // If file already exists, skip to the next iteration
-        if (existingFileData && existingFileData.length > 0) {
-          console.log(`File ${filePath} already exists. Skipping upload.`);
-          console.log(existingFileData)
-        } else {
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('schedule_stuff_bucket')
             .upload(filePath, file)
@@ -114,38 +91,31 @@ export async function POST(request: Request) {
           .getPublicUrl(filePath)
     
           if (fileType === 'image') {
-            imageUrls.push(publicUrl)
+            imageUrl = publicUrl
           } else if (fileType === 'video') {
-            console.log("QUA")
-            videoUrls.push(publicUrl)
+            videoUrl = publicUrl
           }
-        }
       }
     }
 
-    // Determine the final status based on the input
-    const finalStatus = status === 'published' && scheduledAt ? 'scheduled' : status;
     
-    console.log("QUA")
-    // Data to be inserted or updated
     const postData: Record<string, any> = {
-      post_id: actualPostId,
+      post_id: postId,
       clerk_user_id: userId,
       content,
       scheduled_at: scheduledAt,
-      status: finalStatus,
+      status: 'scheduled',
       created_at: new Date().toISOString(),
       time_zone: user_time_zone,
     };
     
     // Only add image_url if not empty
-    if (imageUrls && imageUrls.length > 0) {
-      postData.image_url = imageUrls;
-    }
+    if (imageUrl)
+      postData.image_url = imageUrl;
 
     // Only add video_url if not empty
-    if (videoUrls && videoUrls.length > 0) {
-      postData.video_url = videoUrls;
+    if (videoUrl) {
+      postData.video_url = videoUrl;
     }
     // Insert or update the post in Supabase
     const { data, error } = await supabase
