@@ -185,12 +185,21 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
     }
 
     let scheduledAt: Date | null = null;
+    console.log(time)
     if (status === 'scheduled') {
       if ((!time || time === '-99:00')) {
         toast({
           variant: "destructive",
           title: "Error",
           description: "Time of scheduling cannot be empty"
+        })
+        return
+      }
+      if (!scheduledAt && !(!time || time === '00:00') ) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Date of scheduling cannot be empty"
         })
         return
       }

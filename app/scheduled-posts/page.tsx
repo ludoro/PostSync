@@ -2,23 +2,38 @@
 import { MainSidebar } from '@/components/MainSidebar'
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation' // Adjust import based on your routing library
+import { useRouter } from 'next/navigation'
 
 // Define the type for draft posts
 interface ScheduledPost {
     id: string
     title: string
     content: string
+    scheduledAt: string // Keep this as a string since it's JSON-parsed
 }
 
 export default function Page() {
-    const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]) // Explicit type
+    const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([])
     const router = useRouter()
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+    // Utility to format date to user's timezone
+    const formatDateToUserTimezone = (utcDate: string) => {
+        return new Intl.DateTimeFormat('en-US', {
+            timeZone: userTimezone,
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+        }).format(new Date(utcDate))
+    }
 
     useEffect(() => {
         const fetchScheduledPosts = async () => {
             const response = await fetch('/api/scheduled_posts')
-            const data: ScheduledPost[] = await response.json() // Ensure correct type
+            const data: ScheduledPost[] = await response.json()
             setScheduledPosts(data)
         }
 
@@ -26,9 +41,9 @@ export default function Page() {
     }, [])
 
     const handleEdit = (id: string) => {
-      sessionStorage.setItem('edit-draft-origin', 'scheduled-posts')
-      router.push(`/edit-draft/${id}`)
-  }
+        sessionStorage.setItem('edit-draft-origin', 'scheduled-posts')
+        router.push(`/edit-draft/${id}`)
+    }
 
     return (
         <SidebarProvider>
@@ -57,6 +72,9 @@ export default function Page() {
                                         {post.content.length > 100
                                             ? post.content.substring(0, 100) + '...'
                                             : post.content}
+                                    </p>
+                                    <p className="text-sm text-gray-500 mt-2">
+                                        Scheduled At: {formatDateToUserTimezone(post.scheduledAt)}
                                     </p>
                                     <button
                                         onClick={() => handleEdit(post.id)}
