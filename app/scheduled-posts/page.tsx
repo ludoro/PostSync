@@ -77,7 +77,7 @@ export default function Page() {
     const handleSave = async (updatedPost: Post) => {
         try {
             const response = await fetch(`/api/update_scheduled_post/${updatedPost.id}`, {
-                method: 'PUT',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
