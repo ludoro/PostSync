@@ -31,6 +31,8 @@ export async function POST(request: Request) {
     }
 
     const postId = 'postid_' + Math.random().toString(36).replace(/\./, '')
+    const actualPostId = existing_id ? existing_id : postId;
+
     const imageUrls: string[] = []
     const videoUrls: string[] = []
 
@@ -68,47 +70,72 @@ export async function POST(request: Request) {
           continue;
         }
     
-        const filePath = `files/${postId}_${i}.${fileExt}`
-    
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('schedule_stuff_bucket')
-          .upload(filePath, file)
-    
-        if (uploadError) {
-          console.error('Upload error:', uploadError)
-          continue; // Skip this file but continue with others
+        const filePath = `files/${actualPostId}_${i}.${fileExt}`
+        
+        console.log(filePath)
+        const { data: existingFileData, error: checkError } = await supabase.storage
+        .from('schedule_stuff_bucket')
+        .list('', { 
+          search: `files/${actualPostId}_${i}.` 
+        });
+        
+        console.log(existingFileData)
+
+
+        if (checkError) {
+          console.error('Error checking file existence:', checkError);
+          continue; // Skip this file if there's an error checking
         }
-    
-        const { data: { publicUrl } } = supabase.storage
+
+        // If file already exists, skip to the next iteration
+        if (existingFileData && existingFileData.length > 0) {
+          console.log(`File ${filePath} already exists. Skipping upload.`);
+          console.log(existingFileData)
+        } else {
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('schedule_stuff_bucket')
+            .upload(filePath, file)
+          
+          if (uploadError) {
+            console.error('Upload error:', uploadError)
+            continue; // Skip this file but continue with others
+          }
+          const { data: { publicUrl } } = supabase.storage
           .from('schedule_stuff_bucket')
           .getPublicUrl(filePath)
     
-        if (fileType === 'image') {
-          imageUrls.push(publicUrl)
-        } else if (fileType === 'video') {
-          videoUrls.push(publicUrl)
+          if (fileType === 'image') {
+            imageUrls.push(publicUrl)
+          } else if (fileType === 'video') {
+            videoUrls.push(publicUrl)
+          }
         }
       }
     }
-
-    const actualPostId = existing_id ? existing_id : postId;
 
     // Determine the final status based on the input
     const finalStatus = status === 'published' && scheduledAt ? 'scheduled' : status;
 
     // Data to be inserted or updated
-    const postData = {
+    const postData: Record<string, any> = {
       post_id: actualPostId,
       clerk_user_id: userId,
       content,
       scheduled_at: scheduledAt,
-      status: finalStatus, // Use the determined status
+      status: finalStatus,
       created_at: new Date().toISOString(),
-      image_urls: imageUrls,
-      video_urls: videoUrls,
       time_zone: user_time_zone,
     };
     
+    // Only add image_urls if not empty
+    if (imageUrls && imageUrls.length > 0) {
+      postData.image_urls = imageUrls;
+    }
+
+    // Only add video_urls if not empty
+    if (videoUrls && videoUrls.length > 0) {
+      postData.video_urls = videoUrls;
+    }
     // Insert or update the post in Supabase
     const { data, error } = await supabase
       .from('posts')
