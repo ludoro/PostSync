@@ -355,7 +355,7 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
                 <div className="space-y-2">
                   <Label>Publishing Schedule</Label>
                   <p className="text-sm text-gray-500 mb-2">
-                    {!date ? "Post will be scheduled for the next available 15-minute interval if not date is set." 
+                    {!date ? "Post will be scheduled for the next available 15-minute interval if no date is set." 
                           : `Scheduled for ${date.toLocaleDateString()} at ${time}`}
                   </p>
                   <div className="flex space-x-2">
@@ -378,6 +378,9 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
                           selected={date}
                           onSelect={(selectedDate) => {
                             if (selectedDate && selectedDate > new Date()) {
+                              setDate(selectedDate);
+                            } else if (selectedDate) {
+                              // Select the current day if the user selects today
                               setDate(selectedDate);
                             }
                           }}
