@@ -5,7 +5,6 @@ import { X } from 'lucide-react'
 // Define the type for draft posts
 interface Post {
     id: string
-    title: string
     content: string
     scheduledAt: string // Keep this as a string since it's JSON-parsed
     image_url?: string[]
@@ -26,13 +25,11 @@ export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({
   onClose, 
   onSave 
 }) => {
-  const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
   const [isSaving, setIsSaving] = useState(false)
 
   // Reset form when post changes
   useEffect(() => {
-    setTitle(post.title)
     setContent(post.content)
   }, [post])
 
@@ -41,7 +38,6 @@ export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({
     try {
       await onSave({
         ...post,
-        title,
         content
       })
       onClose()
@@ -72,18 +68,6 @@ export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({
 
         {/* Content */}
         <div className="p-6 space-y-4">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-              Title
-            </label>
-            <input 
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
 
           <div>
             <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">

@@ -10,7 +10,6 @@ import { Toaster } from "@/components/ui/toaster"
 // Define the type for draft posts
 interface Post {
     id: string
-    title: string
     content: string
     scheduledAt: string // Keep this as a string since it's JSON-parsed
     image_url?: string[]
@@ -77,7 +76,7 @@ export default function Page() {
     // Handle saving an edited post
     const handleSave = async (updatedPost: Post) => {
         try {
-            const response = await fetch(`/api/scheduled_posts/${updatedPost.id}`, {
+            const response = await fetch(`/api/update_scheduled_post/${updatedPost.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -146,9 +145,6 @@ export default function Page() {
                                     className="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                                 >
                                     <p className="text-black font-bold mb-2">Scheduled Post</p>
-                                    <h3 className="text-lg font-semibold mb-2 text-gray-800">
-                                        {post.title}
-                                    </h3>
                                     <p className="text-gray-600 text-sm">
                                         {post.content.length > 100
                                             ? post.content.substring(0, 100) + '...'
