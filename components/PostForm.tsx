@@ -87,6 +87,8 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
     URL.revokeObjectURL(preview)
   }
 
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const timeOptions = React.useMemo(() => {
     const times = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -97,6 +99,28 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
     }
     return times;
   }, []);
+  
+  const filteredTimeOptions = React.useMemo(() => {
+    if (!date) return timeOptions;
+  
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Remove time component from today
+  
+    if (date.getTime() !== today.getTime()) {
+      return timeOptions; // If not today, show all options
+    }
+  
+    // Current time in user's timezone
+    const now = new Date().toLocaleTimeString('en-US', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      timeZone: userTimezone 
+    });
+  
+    return timeOptions.filter((timeOption) => timeOption >= now);
+  }, [date, timeOptions, userTimezone]);
+  
 
   const getNextFifteenMinuteInterval = () => {
     const now = new Date();
@@ -387,16 +411,13 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
                         />
                       </PopoverContent>
                     </Popover>
-                    <Select
-                      value={time}
-                      onValueChange={setTime}
-                    >
+                    <Select value={time} onValueChange={setTime}>
                       <SelectTrigger className="w-[130px]">
                         <Clock className="mr-2 h-4 w-4" />
                         <SelectValue placeholder="Select time" />
                       </SelectTrigger>
                       <SelectContent>
-                        {timeOptions.map((timeOption) => (
+                        {filteredTimeOptions.map((timeOption) => (
                           <SelectItem key={timeOption} value={timeOption}>
                             {timeOption}
                           </SelectItem>
