@@ -195,28 +195,35 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
         })
         return
       }
-      if (!scheduledAt && !(!time || time === '00:00') ) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Date of scheduling cannot be empty"
-        })
-        return
-      }
     }
 
     setIsSubmitting(true)
     try {
       
       if (status === 'scheduled') {
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         if (date) {
           // Use selected date and time
           const [hours, minutes] = time.split(':')
           scheduledAt = new Date(date)
           scheduledAt.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+
+          // Convert to UTC
+          const utcYear = scheduledAt.getUTCFullYear();
+          const utcMonth = scheduledAt.getUTCMonth();
+          const utcDate = scheduledAt.getUTCDate();
+          const utcHours = scheduledAt.getUTCHours();
+          const utcMinutes = scheduledAt.getUTCMinutes();
+          const utcSeconds = scheduledAt.getUTCSeconds();
+
+          scheduledAt = new Date(Date.UTC(utcYear, utcMonth, utcDate, utcHours, utcMinutes, utcSeconds));
+
+
         } else {
           // Use next 15-minute interval
           scheduledAt = getNextFifteenMinuteInterval();
+          scheduledAt = new Date(scheduledAt.toISOString());
+
         }
       }
 
