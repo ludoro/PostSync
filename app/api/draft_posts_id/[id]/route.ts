@@ -45,14 +45,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
       content: data.content,
       created_at: data.created_at,
       scheduledAt: data.scheduled_at,
-      files: [
-        ...(data.image_urls || []),
-        ...(data.video_urls || [])
-      ],
-      fileTypes: [
-        ...Array(data.image_urls?.length || 0).fill('image'),
-        ...Array(data.video_urls?.length || 0).fill('video')
-      ]
+      image_urls: data.image_urls,
+      video_urls: data.video_urls,
     }
 
     return NextResponse.json(transformedDraft)
