@@ -85,6 +85,8 @@ export default function EditDraft() {
                                 prev ? { ...prev, time } : null
                             )
                         }
+                        image_urls={draft?.image_urls || []}
+                        video_urls={draft?.video_urls || []}
                     />
                 </main>
             </div>

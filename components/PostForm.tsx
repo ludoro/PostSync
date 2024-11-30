@@ -42,6 +42,7 @@ interface PostFormProps {
 }
 
 type PostStatus = 'draft' | 'scheduled' | 'published';
+
 type FilePreview = {
   file: File
   preview: string
@@ -51,10 +52,39 @@ type FilePreview = {
 export default function PostForm({ existingPostId, date, setDate, time, setTime, content, setContent, image_urls, video_urls}: PostFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [files, setFiles] = React.useState<FilePreview[]>([])
+
+  const [files, setFiles] = React.useState<FilePreview[]>(() => {
+    const initialFiles: FilePreview[] = [];
+  
+    // Add image URLs
+    if (image_urls && image_urls.length > 0) {
+      const imageFiles = image_urls.map((url) => ({
+        file: new File([], url.split('/').pop() || 'image.jpg', { type: 'image/jpeg' }),
+        preview: `https://ghjciaynkxnhbgxnkbwp.supabase.co/storage/v1/object/public/schedule_stuff_bucket/files/${url.split('/').slice(-1)[0]}`,
+        type: 'image' as const,
+      }));
+      initialFiles.push(...imageFiles);
+    }
+  
+    // Add video URL (only one video allowed)
+    if (video_urls && video_urls.length > 0) {
+      const videoFile = {
+        file: new File([], video_urls[0].split('/').pop() || 'video.mp4', { type: 'video/mp4' }),
+        preview: `https://ghjciaynkxnhbgxnkbwp.supabase.co/storage/v1/object/public/schedule_stuff_bucket/files/${video_urls[0].split('/').slice(-1)[0]}`,
+        type: 'video' as const,
+      };
+      initialFiles.push(videoFile);
+    }
+  
+    return initialFiles;
+  });
+
+
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const videoInputRef = React.useRef<HTMLInputElement>(null)
   const { toast } = useToast()
+
+  
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const selectedFiles = Array.from(e.target.files || [])
 
