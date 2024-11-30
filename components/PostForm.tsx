@@ -39,7 +39,7 @@ interface PostFormProps {
   setContent: (content: string) => void;
 }
 
-type PostStatus = 'draft' | 'scheduled';
+type PostStatus = 'draft' | 'scheduled' | 'published';
 type FilePreview = {
   file: File
   preview: string
