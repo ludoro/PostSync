@@ -45,8 +45,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
       content: data.content,
       created_at: data.created_at,
       scheduledAt: data.scheduled_at,
-      image_urls: data.image_urls,
-      video_urls: data.video_urls,
+      image_url: data.image_url,
+      video_url: data.video_url,
     }
 
     return NextResponse.json(transformedDraft)
@@ -82,8 +82,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         title: body.title,
         content: body.content,
         scheduled_at: body.scheduledAt,
-        image_urls: body.files?.filter((_: string, i: number) => body.fileTypes[i] === 'image'),
-        video_urls: body.files?.filter((_: string, i: number) => body.fileTypes[i] === 'video')
+        image_url: body.files?.filter((_: string, i: number) => body.fileTypes[i] === 'image'),
+        video_url: body.files?.filter((_: string, i: number) => body.fileTypes[i] === 'video')
       })
       .eq('clerk_user_id', userId)
       .eq('post_id', id)

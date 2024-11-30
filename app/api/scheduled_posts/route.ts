@@ -41,8 +41,8 @@ export async function GET(request: Request) {
       content: scheduled.content,
       created_at: scheduled.created_at,
       scheduledAt: scheduled.scheduled_at,
-      image_urls: scheduled.image_urls,
-      video_urls: scheduled.video_urls
+      image_url: scheduled.image_url,
+      video_url: scheduled.video_url
     }))
 
     return NextResponse.json(transformedDrafts)

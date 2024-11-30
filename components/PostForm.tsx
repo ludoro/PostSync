@@ -37,8 +37,8 @@ interface PostFormProps {
   setTime: (time: string) => void;
   content: string;
   setContent: (content: string) => void;
-  image_urls?: string[];
-  video_urls?: string[];
+  image_url?: string[];
+  video_url?: string[];
 }
 
 type PostStatus = 'draft' | 'scheduled' | 'published';
@@ -49,7 +49,7 @@ type FilePreview = {
   type: 'image' | 'video'
 }
 
-export default function PostForm({ existingPostId, date, setDate, time, setTime, content, setContent, image_urls, video_urls}: PostFormProps) {
+export default function PostForm({ existingPostId, date, setDate, time, setTime, content, setContent, image_url, video_url}: PostFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
@@ -57,8 +57,8 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
     const initialFiles: FilePreview[] = [];
   
     // Add image URLs
-    if (image_urls && image_urls.length > 0) {
-      const imageFiles = image_urls.map((url) => ({
+    if (image_url && image_url.length > 0) {
+      const imageFiles = image_url.map((url) => ({
         file: new File([], url.split('/').pop() || 'image.jpg', { type: 'image/jpeg' }),
         preview: `https://ghjciaynkxnhbgxnkbwp.supabase.co/storage/v1/object/public/schedule_stuff_bucket/files/${url.split('/').slice(-1)[0]}`,
         type: 'image' as const,
@@ -67,10 +67,10 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
     }
   
     // Add video URL (only one video allowed)
-    if (video_urls && video_urls.length > 0) {
+    if (video_url && video_url.length > 0) {
       const videoFile = {
-        file: new File([], video_urls[0].split('/').pop() || 'video.mp4', { type: 'video/mp4' }),
-        preview: `https://ghjciaynkxnhbgxnkbwp.supabase.co/storage/v1/object/public/schedule_stuff_bucket/files/${video_urls[0].split('/').slice(-1)[0]}`,
+        file: new File([], video_url[0].split('/').pop() || 'video.mp4', { type: 'video/mp4' }),
+        preview: `https://ghjciaynkxnhbgxnkbwp.supabase.co/storage/v1/object/public/schedule_stuff_bucket/files/${video_url[0].split('/').slice(-1)[0]}`,
         type: 'video' as const,
       };
       initialFiles.push(videoFile);

@@ -138,14 +138,14 @@ export async function POST(request: Request) {
       time_zone: user_time_zone,
     };
     
-    // Only add image_urls if not empty
+    // Only add image_url if not empty
     if (imageUrls && imageUrls.length > 0) {
-      postData.image_urls = imageUrls;
+      postData.image_url = imageUrls;
     }
 
-    // Only add video_urls if not empty
+    // Only add video_url if not empty
     if (videoUrls && videoUrls.length > 0) {
-      postData.video_urls = videoUrls;
+      postData.video_url = videoUrls;
     }
     // Insert or update the post in Supabase
     const { data, error } = await supabase

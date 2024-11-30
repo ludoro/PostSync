@@ -42,12 +42,12 @@ export async function GET(request: Request) {
       created_at: draft.created_at,
       scheduledAt: draft.scheduled_at,
       files: [
-        ...(draft.image_urls || []),
-        ...(draft.video_urls || [])
+        ...(draft.image_url || []),
+        ...(draft.video_url || [])
       ],
       fileTypes: [
-        ...Array(draft.image_urls?.length || 0).fill('image'),
-        ...Array(draft.video_urls?.length || 0).fill('video')
+        ...Array(draft.image_url?.length || 0).fill('image'),
+        ...Array(draft.video_url?.length || 0).fill('video')
       ]
     }))
 
