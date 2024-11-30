@@ -37,40 +37,48 @@ export async function POST(request: Request) {
     const videoUrls: string[] = []
 
     if (files && Array.isArray(files) && files.length > 0) {
-      console.log("Entering files check")
       for (let i = 0; i < files.length; i++) {
-        console.log("Looping over files")
         const fileData = files[i]
         const fileType = fileTypes?.[i]
     
-        console.log("fileData type:", typeof fileData)
-        console.log("fileData:", fileData)
-    
-        if (!fileData) continue; // Skip undefined files
-        console.log("File is defined")
+        if (!fileData) continue;
     
         let file: File | Blob
-        let fileName: string
         let fileExt: string = 'unknown'
     
-        // Check if it's a base64 string
+        // Improved base64 handling
         if (typeof fileData === 'string' && fileData.startsWith('data:')) {
-          console.log("Base64 string detected")
-          const match = fileData.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9]+);base64,/)
-          if (match) {
-            fileExt = match[1].split('/')[1]
-            const base64Response = await fetch(fileData)
-            file = await base64Response.blob()
-          } else {
-            console.log("Invalid base64 string")
+          try {
+            // Split the base64 string into parts
+            const base64Parts = fileData.split(',');
+            if (base64Parts.length < 2) {
+              console.log("Invalid base64 string format");
+              continue;
+            }
+    
+            // Extract MIME type and extension
+            const mimeType = base64Parts[0].split(':')[1].split(';')[0];
+            fileExt = mimeType.split('/')[1] || 'unknown';
+    
+            // Convert base64 to Blob directly
+            const byteCharacters = atob(base64Parts[1]);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let j = 0; j < byteCharacters.length; j++) {
+              byteNumbers[j] = byteCharacters.charCodeAt(j);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            file = new Blob([byteArray], { type: mimeType });
+          } catch (conversionError) {
+            console.error('Error converting base64 to blob:', conversionError);
             continue;
           }
         } else {
-          console.log("Unexpected file data type")
+          console.log("Unexpected file data type");
           continue;
         }
     
         const filePath = `files/${actualPostId}_${i}.${fileExt}`
+        
         
         console.log(filePath)
         const { data: existingFileData, error: checkError } = await supabase.storage
@@ -95,8 +103,9 @@ export async function POST(request: Request) {
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('schedule_stuff_bucket')
             .upload(filePath, file)
-          
+          console.log("QUI")
           if (uploadError) {
+            console.log("QUA")
             console.error('Upload error:', uploadError)
             continue; // Skip this file but continue with others
           }
@@ -107,6 +116,7 @@ export async function POST(request: Request) {
           if (fileType === 'image') {
             imageUrls.push(publicUrl)
           } else if (fileType === 'video') {
+            console.log("QUA")
             videoUrls.push(publicUrl)
           }
         }
@@ -115,7 +125,8 @@ export async function POST(request: Request) {
 
     // Determine the final status based on the input
     const finalStatus = status === 'published' && scheduledAt ? 'scheduled' : status;
-
+    
+    console.log("QUA")
     // Data to be inserted or updated
     const postData: Record<string, any> = {
       post_id: actualPostId,
@@ -143,6 +154,7 @@ export async function POST(request: Request) {
       .select();
 
     if (error) {
+      console.log("QUA")
       console.error('Error inserting post:', error)
       throw error
     }
