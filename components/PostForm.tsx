@@ -164,7 +164,7 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
 
   const resetSchedule = () => {
     setDate(undefined);
-    setTime('00:00');
+    setTime('-99:00');
   };
 
   const resetFiles = () => {
@@ -184,9 +184,20 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
       return
     }
 
+    let scheduledAt: Date | null = null;
+    if (status === 'scheduled') {
+      if ((!time || time === '-99:00')) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Time of scheduling cannot be empty"
+        })
+        return
+      }
+    }
+
     setIsSubmitting(true)
     try {
-      let scheduledAt: Date | null = null;
       
       if (status === 'scheduled') {
         if (date) {
