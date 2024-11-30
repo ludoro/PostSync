@@ -74,7 +74,7 @@ export default function Page() {
                                             : post.content}
                                     </p>
                                     <p className="text-sm text-gray-500 mt-2">
-                                        Scheduled At: {formatDateToUserTimezone(post.scheduledAt)}
+                                        <strong>Scheduled At:</strong> {formatDateToUserTimezone(post.scheduledAt)}
                                     </p>
                                     <button
                                         onClick={() => handleEdit(post.id)}
