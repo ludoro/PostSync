@@ -377,10 +377,9 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
                           mode="single"
                           selected={date}
                           onSelect={(selectedDate) => {
-                            if (selectedDate && selectedDate > new Date()) {
-                              setDate(selectedDate);
-                            } else if (selectedDate) {
-                              // Select the current day if the user selects today
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // Strip the time from "today"
+                            if (selectedDate && selectedDate >= today) {
                               setDate(selectedDate);
                             }
                           }}
