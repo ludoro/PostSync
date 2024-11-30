@@ -10,8 +10,7 @@ const supabase = createClient(
 export async function POST(request: Request) {
   try {
     const json = await request.json()
-    const { existing_id, content, scheduledAt, status, files, fileTypes, user_time_zone } = json
-    console.log("Scheduling post?")
+    const { content, scheduledAt, files, fileTypes, user_time_zone } = json
 
     if (!content?.trim()) {
       return NextResponse.json(
@@ -105,18 +104,12 @@ export async function POST(request: Request) {
       content,
       scheduled_at: scheduledAt,
       status: 'scheduled',
+      image_url: imageUrl,
+      video_url: videoUrl,
       created_at: new Date().toISOString(),
       time_zone: user_time_zone,
     };
     
-    // Only add image_url if not empty
-    if (imageUrl)
-      postData.image_url = imageUrl;
-
-    // Only add video_url if not empty
-    if (videoUrl) {
-      postData.video_url = videoUrl;
-    }
     // Insert or update the post in Supabase
     const { data, error } = await supabase
       .from('posts')
@@ -124,7 +117,6 @@ export async function POST(request: Request) {
       .select();
 
     if (error) {
-      console.log("QUA")
       console.error('Error inserting post:', error)
       throw error
     }
