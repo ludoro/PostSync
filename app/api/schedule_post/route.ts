@@ -10,7 +10,7 @@ const supabase = createClient(
 export async function POST(request: Request) {
   try {
     const json = await request.json()
-    const { existing_id, content, scheduledAt, status, files, fileTypes } = json
+    const { existing_id, content, scheduledAt, status, files, fileTypes, user_time_zone } = json
     console.log("Scheduling post?")
 
     if (!content?.trim()) {
@@ -106,6 +106,7 @@ export async function POST(request: Request) {
       created_at: new Date().toISOString(),
       image_urls: imageUrls,
       video_urls: videoUrls,
+      time_zone: user_time_zone,
     };
     
     // Insert or update the post in Supabase

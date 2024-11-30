@@ -53,7 +53,6 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const videoInputRef = React.useRef<HTMLInputElement>(null)
   const { toast } = useToast()
-  console.log("PRINT EXISTING POST ID: ")
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video') => {
     const selectedFiles = Array.from(e.target.files || [])
     
@@ -149,7 +148,9 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
   };
 
   const handleSubmit = async (status: PostStatus) => {
-
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    console.log("Starting handlen submit")
+    console.log(userTimezone);
     if (!content.trim()) {
       toast({
         variant: "destructive",
@@ -214,7 +215,8 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
           scheduledAt,
           status,
           files: processedFiles.map(f => f.base64),
-          fileTypes: processedFiles.map(f => f.type)
+          fileTypes: processedFiles.map(f => f.type),
+          user_time_zone: userTimezone
         })
       })
 
