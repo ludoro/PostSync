@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const json = await request.json()
     const { content, scheduledAt, files, fileTypes, user_time_zone } = json
 
-    if (!content?.trim()) {
+    if (!content?.trim() && !files) {
       return NextResponse.json(
         { message: 'Content is required' },
         { status: 400 }

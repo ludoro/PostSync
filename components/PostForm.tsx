@@ -30,7 +30,6 @@ import { Toaster } from "@/components/ui/toaster"
 import confetti from 'canvas-confetti';
 
 interface PostFormProps {
-  existingPostId: string | null | undefined;
   date?: Date;
   setDate: (date?: Date) => void;
   time: string;
@@ -49,7 +48,7 @@ type FilePreview = {
   type: 'image' | 'video'
 }
 
-export default function PostForm({ existingPostId, date, setDate, time, setTime, content, setContent, image_url, video_url}: PostFormProps) {
+export default function PostForm({date, setDate, time, setTime, content, setContent, image_url, video_url}: PostFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
@@ -207,7 +206,8 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     console.log("Starting handlen submit")
     console.log(userTimezone);
-    if (!content.trim()) {
+    setIsSubmitting(true)
+    if (!content.trim() && files.length === 0) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -215,23 +215,20 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
       })
       return
     }
-
-    let scheduledAt: Date | null = null;
-    console.log(time)
-    if (status === 'scheduled') {
-      if ((!time || time === '-99:00')) {
+    // Validate date and time
+    if (date && (!time || time === '-99:00')) {
         toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Time of scheduling cannot be empty"
-        })
-        return
-      }
+            variant: "destructive",
+            title: "Error",
+            description: "Please select a time when a date is chosen"
+        });
+        setIsSubmitting(false);
+        return;
     }
 
-    setIsSubmitting(true)
+    let scheduledAt: Date | null = null;
+
     try {
-      
       if (status === 'scheduled') {
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         if (date) {
@@ -285,15 +282,12 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
         
 
       const processedFiles = await Promise.all(filePromises);
-      console.log("Before scheduling post")
-      console.log(existingPostId)
       const response = await fetch('/api/schedule_post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          existing_id: existingPostId, // Changed from existingPostId to existing_id
           content,
           scheduledAt,
           status,
@@ -308,39 +302,18 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
         throw new Error(error.message || 'Failed to save post')
       }
 
-      if (status === 'scheduled') {
-        triggerConfetti()
-      }
-
+      triggerConfetti()
       toast({
-        title: status === 'scheduled' ? "🎉 Success!" : "✓ Saved",
-        description: status === 'scheduled' 
-          ? `Your post has been scheduled for ${scheduledAt!.toLocaleDateString()} at ${formatTimeForSelect(scheduledAt!)}`
-          : "Your post has been saved as a draft",
-        className: status === 'scheduled' ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200",
+        title: "🎉 Success!",
+        description: `Your post has been scheduled for ${scheduledAt!.toLocaleDateString()} at ${formatTimeForSelect(scheduledAt!)}`,
+        className: "bg-green-50 border-green-200",
       })
 
       setContent('')
-      if (status === 'scheduled') {
-        resetSchedule()
-        resetFiles()
-      }
-      // Create a toast with a clear message about redirection
-      const redirectToast = toast({
-        title: "✨ Success!",
-        description: status === 'scheduled' 
-          ? `Post scheduled for ${scheduledAt!.toLocaleDateString()} at ${formatTimeForSelect(scheduledAt!)}. Redirecting to dashboard...`
-          : "Draft saved. Redirecting to dashboard...",
-        duration: 2000, // Show for 2 seconds
-        className: "bg-green-50 border-green-200"
-      })
-
-      // Wait for the toast to be visible
-      await new Promise(resolve => setTimeout(resolve, 2000))
-
-      // Close the toast and redirect
-      redirectToast.dismiss()
+      resetSchedule()
+      resetFiles()
       router.push('/dashboard')
+      setIsSubmitting(false);
     } catch (error) {
       console.error('Error saving post:', error)
       toast({
@@ -348,8 +321,7 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to save post. Please try again."
       })
-    } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -502,11 +474,11 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
           <Button 
             className="bg-blue-500 hover:bg-blue-600 text-white"
             onClick={() => handleSubmit('scheduled')}
-            disabled={isSubmitting}
           >
             {isSubmitting ? "Saving..." : date ? "Schedule Post" : "Publish as soon as possible"}
           </Button>
         </CardFooter>
+        <Toaster/>
       </Card>
     </>
   );
