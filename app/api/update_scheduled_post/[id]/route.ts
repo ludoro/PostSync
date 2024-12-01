@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
+import { link } from 'fs'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,9 +32,24 @@ export async function POST(request: Request) {
       )
     }
 
+
+    if (!twitter_content && !linkedin_content) {
+      // Delete row that equals to post id from supabase
+      const { data: deleteData, error: deleteError } = await supabase
+        .from('posts')
+        .delete()
+        .eq('post_id', post_id)
+      if (deleteError) {
+        console.error('Error deleting post:', deleteError);
+        throw deleteError;
+      }
+    }
+
     
     const postData: Record<string, any> = {
         scheduled_at,
+        twitter_content: twitter_content ? twitter_content : null,
+        linkedin_content: linkedin_content ? linkedin_content : null,
     };
     if (twitter_content) {
       postData.twitter_content = twitter_content
