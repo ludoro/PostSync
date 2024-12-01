@@ -5,7 +5,6 @@ import * as React from 'react'
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { MainSidebar } from '@/components/MainSidebar'
 import PostForm from '@/components/PostForm'
-import PostReview from '@/components/PostReview'
 import PlanSelectionOverlay from '@/components/PlanSelectionOverlay'
 
 
@@ -41,14 +40,6 @@ export default function Dashboard() {
             setContent={setPostContent}
           />
         </main>
-
-
-        {/* Don't show this for now */}
-        {false && <PostReview
-          date={date}
-          time={time}
-          content={postContent}
-        />}
       </div>
     </SidebarProvider>
   )
