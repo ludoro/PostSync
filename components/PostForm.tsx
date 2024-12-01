@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Calendar, Image, Video, Clock, X } from 'lucide-react'
+import { Calendar, Image, Video, Clock, X, Linkedin, Twitter } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import confetti from 'canvas-confetti';
@@ -48,9 +49,14 @@ type FilePreview = {
   type: 'image' | 'video'
 }
 
+
 export default function PostForm({date, setDate, time, setTime, content, setContent, image_url, video_url}: PostFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [postToLinkedIn, setPostToLinkedIn] = React.useState(false)
+  const [postToTwitter, setPostToTwitter] = React.useState(false)
+  const [linkedinContent, setLinkedInContent] = React.useState('')
+  const [twitterContent, setTwitterContent] = React.useState('')
 
   const [files, setFiles] = React.useState<FilePreview[]>(() => {
     const initialFiles: FilePreview[] = [];
@@ -207,7 +213,7 @@ export default function PostForm({date, setDate, time, setTime, content, setCont
     console.log("Starting handlen submit")
     console.log(userTimezone);
     setIsSubmitting(true)
-    if (!content.trim() && files.length === 0) {
+    if ( (!linkedinContent.trim() && !twitterContent.trim()) && files.length === 0) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -225,6 +231,27 @@ export default function PostForm({date, setDate, time, setTime, content, setCont
         setIsSubmitting(false);
         return;
     }
+
+        // Validate platform-specific content
+        if (postToLinkedIn && !linkedinContent.trim()) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "LinkedIn post content cannot be empty"
+          })
+          setIsSubmitting(false)
+          return
+        }
+    
+        if (postToTwitter && !twitterContent.trim()) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Twitter post content cannot be empty"
+          })
+          setIsSubmitting(false)
+          return
+        }
 
     let scheduledAt: Date | null = null;
 
@@ -288,7 +315,8 @@ export default function PostForm({date, setDate, time, setTime, content, setCont
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content,
+          linkedinContent,
+          twitterContent,
           scheduledAt,
           status,
           files: processedFiles.map(f => f.base64),
@@ -333,15 +361,57 @@ export default function PostForm({date, setDate, time, setTime, content, setCont
         <CardContent>
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="grid w-full gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="content">Content</Label>
-                <Textarea 
-                  id="content" 
-                  placeholder="Write your post content here" 
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                />
-                <p className="text-sm text-gray-500 text-right">{content.length} characters</p>
+              {/* Platform Selection Toggles */}
+              <div className="flex flex-col space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <Linkedin className="h-5 w-5 text-[#0A66C2]" />
+                    <Switch
+                      id="linkedin-toggle"
+                      checked={postToLinkedIn}
+                      onCheckedChange={setPostToLinkedIn}
+                    />
+                    <Label htmlFor="linkedin-toggle">Post to LinkedIn</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Twitter className="h-5 w-5 text-[#1DA1F2]" />
+                    <Switch
+                      id="twitter-toggle"
+                      checked={postToTwitter}
+                      onCheckedChange={setPostToTwitter}
+                    />
+                    <Label htmlFor="twitter-toggle">Post to Twitter</Label>
+                  </div>
+                </div>
+
+                {/* LinkedIn Content Textarea */}
+                {postToLinkedIn && (
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="linkedin-content">LinkedIn Post Content</Label>
+                    <Textarea 
+                      id="linkedin-content" 
+                      placeholder="Write your LinkedIn-specific content here" 
+                      value={linkedinContent}
+                      onChange={(e) => setLinkedInContent(e.target.value)}
+                    />
+                    <p className="text-sm text-gray-500 text-right">{linkedinContent.length} characters</p>
+                  </div>
+                )}
+
+                {/* Twitter Content Textarea */}
+                {postToTwitter && (
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="twitter-content">Twitter Post Content</Label>
+                    <Textarea 
+                      id="twitter-content" 
+                      placeholder="Write your Twitter-specific content here (280 characters max)" 
+                      value={twitterContent}
+                      onChange={(e) => setTwitterContent(e.target.value)}
+                      maxLength={280}
+                    />
+                    <p className="text-sm text-gray-500 text-right">{twitterContent.length}/280 characters</p>
+                  </div>
+                )}
               </div>
               <div className="flex flex-col space-y-4">
                 <div className="flex space-x-2">

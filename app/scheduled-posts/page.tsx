@@ -10,7 +10,8 @@ import { Toaster } from "@/components/ui/toaster"
 // Define the type for draft posts
 interface Post {
     id: string
-    content: string
+    linkedin_content?: string
+    twitter_content?: string
     scheduledAt: string // Keep this as a string since it's JSON-parsed
     image_url?: string
     video_url?: string
@@ -81,7 +82,8 @@ export default function Page() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ post_id: updatedPost.id, content: updatedPost.content, scheduled_at: updatedPost.scheduledAt })
+                body: JSON.stringify({ post_id: updatedPost.id, linkedin_content: updatedPost.linkedin_content, twitter_content: updatedPost.twitter_content,
+                    scheduled_at: updatedPost.scheduledAt })
             })
     
             if (!response.ok) {
@@ -163,11 +165,15 @@ export default function Page() {
             )}
                 <p className="text-black font-bold mb-2">Content</p>
 
-        <p className="text-gray-600 text-sm">
-            {post.content.length > 100
-                ? post.content.substring(0, 100) + '...'
-                : post.content}
-        </p>
+        {post.linkedin_content && <p className="text-gray-600 text-sm">
+            {
+                post.linkedin_content.substring(0, 100)}
+        </p>}
+
+        { (!post.linkedin_content && post.twitter_content) && <p className="text-gray-600 text-sm">
+            {
+                post.twitter_content.substring(0, 100)}
+        </p>}
 
         {/* Scheduled Time */}
         <p className="text-sm text-gray-500 mt-2">

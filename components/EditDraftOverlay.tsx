@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
-import { X, Calendar, Clock } from 'lucide-react'
+import { X, Calendar, Clock, Linkedin, Twitter } from 'lucide-react'
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
+import { Label } from "@/components/ui/label"
 
 // Define the type for draft posts
 interface Post {
     id: string
-    content: string
+    linkedin_content?: string
+    twitter_content?: string
     scheduledAt: string
     image_url?: string
     video_url?: string
@@ -28,9 +31,11 @@ export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({
     onClose,
     onSave
 }) => {
-    console.log('EditDraftOverlay: Render', { post, isOpen })
+    const [linkedin_content, setLinkedinContent] = useState(post.linkedin_content || '')
+    const [twitter_content, setTwitterContent] = useState(post.twitter_content || '')
+    const [postToLinkedIn, setPostToLinkedIn] = useState(!!post.linkedin_content)
+    const [postToTwitter, setPostToTwitter] = useState(!!post.twitter_content)
 
-    const [content, setContent] = useState(post.content)
     const [date, setDate] = useState<Date | undefined>(
         post.scheduledAt ? new Date(post.scheduledAt) : undefined
     )
@@ -41,16 +46,19 @@ export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({
     )
     const [isSaving, setIsSaving] = useState(false)
 
-    // Generate time options (every 30 minutes)
-    const timeOptions = Array.from({ length: 48 }, (_, i) => {
-        const hour = Math.floor(i / 2)
-        const minute = i % 2 === 0 ? '00' : '30'
+    // Generate time options (every 15 minutes)
+    const timeOptions = Array.from({ length: 96 }, (_, i) => {
+        const hour = Math.floor(i / 4)
+        const minute = ['00', '15', '30', '45'][i % 4]
         return `${hour.toString().padStart(2, '0')}:${minute}`
     })
 
     // Reset form when post changes
     useEffect(() => {
-        setContent(post.content)
+        setLinkedinContent(post.linkedin_content || '')
+        setTwitterContent(post.twitter_content || '')
+        setPostToLinkedIn(!!post.linkedin_content)
+        setPostToTwitter(!!post.twitter_content)
         setDate(post.scheduledAt ? new Date(post.scheduledAt) : undefined)
         setTime(
             post.scheduledAt 
@@ -60,7 +68,6 @@ export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({
     }, [post])
 
     const handleSave = async () => {
-        console.log('EditDraftOverlay: handleSave called')
         setIsSaving(true)
         try {
             // Combine date and time
@@ -72,10 +79,10 @@ export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({
 
             await onSave({
                 ...post,
-                content,
+                linkedin_content: postToLinkedIn ? linkedin_content : undefined,
+                twitter_content: postToTwitter ? twitter_content : undefined,
                 scheduledAt: scheduledAt ? scheduledAt.toISOString() : post.scheduledAt
             })
-            console.log('EditDraftOverlay: onSave completed successfully')
             onClose()
         } catch (error) {
             console.error('EditDraftOverlay: Failed to save draft', error)
@@ -109,21 +116,68 @@ export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({
 
                 {/* Content */}
                 <div className="p-6 space-y-4">
-                    <div>
-                        <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-                            Content
-                        </label>
-                        <textarea
-                            id="content"
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            rows={10}
-                            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                        />
+
+                    {/* Platform Selection */}
+                    <div className="flex items-center space-x-4 mt-4">
+                        <div className="flex items-center space-x-2">
+                            <Linkedin className="h-5 w-5 text-[#0A66C2]" />
+                            <Switch
+                                id="linkedin-toggle"
+                                checked={postToLinkedIn}
+                                onCheckedChange={setPostToLinkedIn}
+                            />
+                            <Label htmlFor="linkedin-toggle">Post to LinkedIn</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Twitter className="h-5 w-5 text-[#1DA1F2]" />
+                            <Switch
+                                id="twitter-toggle"
+                                checked={postToTwitter}
+                                onCheckedChange={setPostToTwitter}
+                            />
+                            <Label htmlFor="twitter-toggle">Post to Twitter</Label>
+                        </div>
                     </div>
 
+                    {/* LinkedIn Content */}
+                    {postToLinkedIn && (
+                        <div className="mt-4">
+                            <label htmlFor="linkedin-content" className="block text-sm font-medium text-gray-700 mb-2">
+                                LinkedIn Post Content
+                            </label>
+                            <textarea
+                                id="linkedin-content"
+                                value={linkedin_content}
+                                onChange={(e) => setLinkedinContent(e.target.value)}
+                                rows={4}
+                                placeholder="Write your LinkedIn-specific content here"
+                                className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                            <p className="text-sm text-gray-500 text-right mt-1">{linkedin_content.length} characters</p>
+                        </div>
+                    )}
+
+                    {/* Twitter Content */}
+                    {postToTwitter && (
+                        <div className="mt-4">
+                            <label htmlFor="twitter-content" className="block text-sm font-medium text-gray-700 mb-2">
+                                Twitter Post Content
+                            </label>
+                            <textarea
+                                id="twitter-content"
+                                value={twitter_content}
+                                onChange={(e) => setTwitterContent(e.target.value)}
+                                rows={4}
+                                maxLength={280}
+                                placeholder="Write your Twitter-specific content here (280 characters max)"
+                                className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                            <p className="text-sm text-gray-500 text-right mt-1">{twitter_content.length}/280 characters</p>
+                        </div>
+                    )}
+
                     {/* Scheduling Section */}
-                    <div className="flex items-center space-x-2">
+                    <div className="mt-4 flex items-center space-x-2">
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button

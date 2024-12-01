@@ -10,9 +10,9 @@ const supabase = createClient(
 export async function POST(request: Request) {
   try {
     const json = await request.json()
-    const { content, scheduledAt, files, fileTypes, user_time_zone } = json
+    const { linkedinContent, twitterContent, scheduledAt, files, fileTypes, user_time_zone } = json
 
-    if (!content?.trim() && !files) {
+    if ((!linkedinContent?.trim() || twitterContent?.trim())  && !files) {
       return NextResponse.json(
         { message: 'Content is required' },
         { status: 400 }
@@ -101,7 +101,8 @@ export async function POST(request: Request) {
     const postData: Record<string, any> = {
       post_id: postId,
       clerk_user_id: userId,
-      content,
+      linkedin_content: linkedinContent,
+      twitter_content: twitterContent,
       scheduled_at: scheduledAt,
       status: 'scheduled',
       image_url: imageUrl,

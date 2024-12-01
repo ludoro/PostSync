@@ -42,7 +42,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const transformedDraft = {
       id: data.post_id,
       title: data.title,
-      content: data.content,
+      linkedin_content: data.linkedin_content,
+      twitter_content: data.twitter_content,
       created_at: data.created_at,
       scheduledAt: data.scheduled_at,
       image_url: data.image_url,
@@ -80,7 +81,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .from('posts')
       .update({
         title: body.title,
-        content: body.content,
+        linkedin_content: body.linkedin_content,
+        twitter_content: body.twitter_content,
         scheduled_at: body.scheduledAt,
         image_url: body.files?.filter((_: string, i: number) => body.fileTypes[i] === 'image'),
         video_url: body.files?.filter((_: string, i: number) => body.fileTypes[i] === 'video')

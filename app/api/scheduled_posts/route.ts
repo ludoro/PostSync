@@ -38,7 +38,8 @@ export async function GET(request: Request) {
     // Transform the data to match the frontend expectations
     const transformedDrafts = data.map(scheduled => ({
       id: scheduled.post_id,
-      content: scheduled.content,
+      linkedin_content: scheduled.linkedin_content,
+      twitter_content: scheduled.twitter_content,
       created_at: scheduled.created_at,
       scheduledAt: scheduled.scheduled_at,
       image_url: scheduled.image_url,
