@@ -221,10 +221,10 @@ export default function SocialIntegrationsPage() {
                     <div className="flex flex-col space-y-2">
                       <span className="text-lg font-semibold">Twitter</span>
                       <span className="text-lg text-gray-500">
-                        Expires: {new Date(twitterData!.expires_at!).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        Never expires. We take care of token refresh.
                       </span>
                       <button
-                        className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-full hover:bg-blue-600 transition-colors duration-300"
+                        className="bg-green-500 text-white font-semibold py-2 px-4 rounded-full hover:bg-blue-600 transition-colors duration-300"
                         onClick={handleTwitterConnect}
                       >
                         Update access
