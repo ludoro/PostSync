@@ -329,6 +329,7 @@ export default function PostForm({date, setDate, time, setTime, content, setCont
 
       if (!response.ok) {
         const error = await response.json()
+        setIsSubmitting(false)
         throw new Error(error.message || 'Failed to save post')
       }
 
