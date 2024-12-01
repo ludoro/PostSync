@@ -10,7 +10,10 @@ const supabase = createClient(
 export async function POST(request: Request) {
   try {
     const json = await request.json()
-    const { content, post_id } = json
+    const { content, post_id, scheduled_at } = json
+    console.log(content)
+    console.log(post_id)
+
 
     if (!content?.trim()) {
       return NextResponse.json(
@@ -32,6 +35,7 @@ export async function POST(request: Request) {
     
     const postData: Record<string, any> = {
         content, // New content to update
+        scheduled_at,
     };
     
     // Update the post in Supabase
@@ -45,6 +49,8 @@ export async function POST(request: Request) {
         console.error('Error updating post:', error);
         throw error;
     }
+
+    console.log(data)
 
     return NextResponse.json(
         { message: 'Updated' },

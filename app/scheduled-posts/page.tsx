@@ -81,45 +81,40 @@ export default function Page() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(updatedPost)
+                body: JSON.stringify({ post_id: updatedPost.id, content: updatedPost.content, scheduled_at: updatedPost.scheduledAt })
             })
-
+    
             if (!response.ok) {
                 const errorData = await response.json()
                 throw new Error(errorData.error || 'Failed to update post')
             }
-
-            const savedPost = await response.json()
-
-            // Update the posts in state
-            setScheduledPosts(currentPosts => 
-                currentPosts.map(p => p.id === savedPost.id ? savedPost : p)
-            )
-
-            // Close the edit overlay
-            setIsEditOverlayOpen(false)
-
-            // Show success toast
-            const redirectToast = toast({
+    
+            // Store toast message in localStorage
+            localStorage.setItem('toastMessage', JSON.stringify({
+                type: 'success',
                 title: "✨ Success!",
-                description: "Post has been updated successfully!",
-                duration: 2000, // Show for 2 seconds
-                className: "bg-green-50 border-green-200"
-              })
-                  // Wait for the toast to be visible
-            await new Promise(resolve => setTimeout(resolve, 2000))
-
-            // Close the toast and redirect
-            redirectToast.dismiss()
+                description: "Post has been updated successfully!"
+            }))
+    
+            // Use window.location for a hard reload
+            window.location.href = '/scheduled-posts'
+    
         } catch (error) {
             console.error('Error saving post:', error)
-            toast({
-                variant: "destructive",
+            
+            // Store error toast in localStorage
+            localStorage.setItem('toastMessage', JSON.stringify({
+                type: 'error',
                 title: "Error",
                 description: "Failed to save post"
-              })
+            }))
+    
+            // Reload page to show error toast
+            window.location.href = '/scheduled-posts'
         }
     }
+    
+    
 
     return (
         <SidebarProvider>
