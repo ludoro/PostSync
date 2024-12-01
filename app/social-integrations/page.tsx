@@ -2,6 +2,7 @@
 import { MainSidebar } from '@/components/MainSidebar'
 import { SidebarProvider } from "@/components/ui/sidebar"
 import LinkedInIntegration from '@/components/linkedin-integration';
+import TwitterIntegration from '@/components/twitter-integration';
 import { useSearchParams } from 'next/navigation';
 import React from 'react';
 
@@ -10,13 +11,14 @@ interface UserData {
 }
 
 export default function SocialIntegrationsPage() {
-  const [userData, setUserData] = React.useState<UserData | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [isDisconnecting, setIsDisconnecting] = React.useState(false);
+  const [linkedInData, setLinkedInData] = React.useState<UserData | null>(null);
+  const [twitterData, setTwitterData] = React.useState<UserData | null>(null);
+  const [isLinkedInLoading, setIsLinkedInLoading] = React.useState(true);
+  const [isTwitterLoading, setIsTwitterLoading] = React.useState(true);
+  const [isLinkedInDisconnecting, setIsLinkedInDisconnecting] = React.useState(false);
+  const [isTwitterDisconnecting, setIsTwitterDisconnecting] = React.useState(false);
 
-
-  const handleConnect = async () => {
-    console.log("Handle connection")
+  const handleLinkedInConnect = async () => {
     try {
       window.location.href = '/api/auth/linkedin';
     } catch (error) {
@@ -24,73 +26,133 @@ export default function SocialIntegrationsPage() {
     }
   };
 
-  const fetchUserData = async () => {
+  const handleTwitterConnect = async () => {
+    try {
+      window.location.href = '/api/auth/twitter';
+    } catch (error) {
+      console.error('Error initiating Twitter connection:', error);
+    }
+  };
+
+  const fetchLinkedInUserData = async () => {
     try {
       const response = await fetch('/api/is_linkedin_connected');
       
       if (response.status === 204) {
-        // Handle the case where no data exists (204 No Content)
-        console.log('No data found for the user');
-        setUserData(null);
+        console.log('No LinkedIn data found for the user');
+        setLinkedInData(null);
         return;
       }
   
       if (!response.ok) {
-        // Handle other error statuses
-        throw new Error(`Failed to fetch user data: ${response.statusText}`);
+        throw new Error(`Failed to fetch LinkedIn user data: ${response.statusText}`);
       }
   
-      // Parse the response if the status is OK (e.g., 200)
       const data = await response.json();
-      // Assuming the response is an array of objects with 'expires_at' property
-      const expiresAt = data[0]?.expires_at; // Adjusted to access the first element of the array
-      setUserData({ expires_at: expiresAt });
+      const expiresAt = data[0]?.expires_at;
+      setLinkedInData({ expires_at: expiresAt });
     } catch (error) {
-      console.error('Error fetching user data:', error);
-      setUserData(null);
+      console.error('Error fetching LinkedIn user data:', error);
+      setLinkedInData(null);
     } finally {
-      setIsLoading(false);
+      setIsLinkedInLoading(false);
+    }
+  };
+
+  const fetchTwitterUserData = async () => {
+    try {
+      const response = await fetch('/api/is_twitter_connected');
+      
+      if (response.status === 204) {
+        console.log('No Twitter data found for the user');
+        setTwitterData(null);
+        return;
+      }
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch Twitter user data: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      const expiresAt = data[0]?.expires_at;
+      setTwitterData({ expires_at: expiresAt });
+    } catch (error) {
+      console.error('Error fetching Twitter user data:', error);
+      setTwitterData(null);
+    } finally {
+      setIsTwitterLoading(false);
     }
   };
 
   React.useEffect(() => {
-    fetchUserData();
+    fetchLinkedInUserData();
+    fetchTwitterUserData();
   }, []);
 
-  const handleDisconnect = async () => {
-    if (isDisconnecting) return;
+  const handleLinkedInDisconnect = async () => {
+    if (isLinkedInDisconnecting) return;
     
     try {
-      setIsDisconnecting(true);
+      setIsLinkedInDisconnecting(true);
       const response = await fetch('/api/auth/linkedin/disconnect', {
         method: 'POST'
       });
       
       if (!response.ok) {
-        throw new Error('Failed to disconnect');
+        throw new Error('Failed to disconnect LinkedIn');
       }
       
-      // Immediately set userData to null to show "Connect Account"
-      setUserData(null);
+      setLinkedInData(null);
       
     } catch (error) {
-      console.error('Error disconnecting:', error);
+      console.error('Error disconnecting LinkedIn:', error);
     } finally {
-      setIsDisconnecting(false);
+      setIsLinkedInDisconnecting(false);
+    }
+  };
+
+  const handleTwitterDisconnect = async () => {
+    if (isTwitterDisconnecting) return;
+    
+    try {
+      setIsTwitterDisconnecting(true);
+      const response = await fetch('/api/auth/twitter/disconnect', {
+        method: 'POST'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to disconnect Twitter');
+      }
+      
+      setTwitterData(null);
+      
+    } catch (error) {
+      console.error('Error disconnecting Twitter:', error);
+    } finally {
+      setIsTwitterDisconnecting(false);
     }
   };
 
   const searchParams = useSearchParams();
   const status = searchParams.get('status');
 
-  const isConnected = React.useMemo(() => {
-    if (!userData?.expires_at) return false;
+  const isLinkedInConnected = React.useMemo(() => {
+    if (!linkedInData?.expires_at) return false;
     
-    const expiryDate = new Date(userData.expires_at);
+    const expiryDate = new Date(linkedInData.expires_at);
     const currentDate = new Date();
     
     return expiryDate > currentDate;
-  }, [userData?.expires_at]);
+  }, [linkedInData?.expires_at]);
+
+  const isTwitterConnected = React.useMemo(() => {
+    if (!twitterData?.expires_at) return false;
+    
+    const expiryDate = new Date(twitterData.expires_at);
+    const currentDate = new Date();
+    
+    return expiryDate > currentDate;
+  }, [twitterData?.expires_at]);
 
   const IntegrationItem = ({ platform, action }: { platform: string; action: string }) => (
     <div className="flex items-center justify-between p-4 rounded-lg shadow-md bg-white">
@@ -115,19 +177,19 @@ export default function SocialIntegrationsPage() {
             <div className="flex flex-col space-y-6">
               {/* Row: Expiration Date, Reconnect Button, and Disconnect Button */}
               <div className="flex items-center justify-between p-4 rounded-lg shadow-md bg-white space-x-6">
-                {isLoading ? (
+                {isLinkedInLoading ? (
                   <div className="animate-pulse bg-gray-200 h-10 w-24 rounded-full"></div>
-                ) : isConnected ? (
+                ) : isLinkedInConnected ? (
                   <>
                     {/* Left: Expiration Date and Update Button */}
                     <div className="flex flex-col space-y-2">
                       <span className="text-lg font-semibold">LinkedIn</span>
                       <span className="text-lg text-gray-500">
-                        Expires: {new Date(userData!.expires_at!).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        Expires: {new Date(linkedInData!.expires_at!).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </span>
                       <button
                         className="bg-green-500 text-white font-semibold py-2 px-4 rounded-full hover:bg-green-600 transition-colors duration-300"
-                        onClick={handleConnect}
+                        onClick={handleLinkedInConnect}
                       >
                         Update access
                       </button>
@@ -136,10 +198,10 @@ export default function SocialIntegrationsPage() {
                     {/* Right: Disconnect Button */}
                     <button 
                       className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-full transition-colors"
-                      onClick={handleDisconnect}
-                      disabled={isDisconnecting}
+                      onClick={handleLinkedInDisconnect}
+                      disabled={isLinkedInDisconnecting}
                     >
-                      {isDisconnecting ? 'Disconnecting...' : 'Disconnect'}
+                      {isLinkedInDisconnecting ? 'Disconnecting...' : 'Disconnect'}
                     </button>
                   </>
                 ) : (
@@ -148,8 +210,43 @@ export default function SocialIntegrationsPage() {
               </div>
             </div>
 
-            {/* Other Integration Items */}
-            <IntegrationItem platform="Twitter" action="Coming Soon" />
+            {/* Twitter Integration */}
+            <div className="flex flex-col space-y-6">
+              <div className="flex items-center justify-between p-4 rounded-lg shadow-md bg-white space-x-6">
+                {isTwitterLoading ? (
+                  <div className="animate-pulse bg-gray-200 h-10 w-24 rounded-full"></div>
+                ) : isTwitterConnected ? (
+                  <>
+                    {/* Left: Expiration Date and Update Button */}
+                    <div className="flex flex-col space-y-2">
+                      <span className="text-lg font-semibold">Twitter</span>
+                      <span className="text-lg text-gray-500">
+                        Expires: {new Date(twitterData!.expires_at!).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </span>
+                      <button
+                        className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-full hover:bg-blue-600 transition-colors duration-300"
+                        onClick={handleTwitterConnect}
+                      >
+                        Update access
+                      </button>
+                    </div>
+
+                    {/* Right: Disconnect Button */}
+                    <button 
+                      className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-full transition-colors"
+                      onClick={handleTwitterDisconnect}
+                      disabled={isTwitterDisconnecting}
+                    >
+                      {isTwitterDisconnecting ? 'Disconnecting...' : 'Disconnect'}
+                    </button>
+                  </>
+                ) : (
+                  <TwitterIntegration onConnect={handleTwitterConnect} />
+                )}
+              </div>
+            </div>
+
+            {/* YouTube Integration */}
             <IntegrationItem platform="YouTube" action="Coming Soon" />
           </div>
         </main>
