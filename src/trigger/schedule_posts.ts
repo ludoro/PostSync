@@ -7,8 +7,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export const deleteScheduledPostsTask = schedules.task({
-  id: "delete-scheduled-posts",
+export const schedulePosts = schedules.task({
+  id: "schedule-posts",
   // Run every 15 minutes
   cron: "*/15 * * * *",
   // Set an optional maxDuration to prevent tasks from running indefinitely
