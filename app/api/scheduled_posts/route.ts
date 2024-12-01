@@ -25,7 +25,7 @@ export async function GET(request: Request) {
       .select('*')
       .eq('clerk_user_id', userId)
       .eq('status', 'scheduled')
-      .order('created_at', { ascending: false }) // Most recent drafts first
+      .order('scheduled_at', { ascending: true }) // Most recent drafts first
 
     if (error) {
       console.error('Error fetching draft posts:', error)
