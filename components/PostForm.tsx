@@ -393,7 +393,7 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Image className="mr-2 h-4 w-4" />
-                    Add Images
+                    Add Images (only one per post)
                   </Button>
                   <Button 
                     variant="outline" 
