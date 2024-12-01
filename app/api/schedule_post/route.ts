@@ -10,7 +10,7 @@ const supabase = createClient(
 export async function POST(request: Request) {
   try {
     const json = await request.json()
-    const { linkedinContent, twitterContent, scheduledAt, files, fileTypes, user_time_zone } = json
+    const { linkedinContent, twitterContent, postToLinkedIn, postToTwitter, scheduledAt, files, fileTypes, user_time_zone } = json
 
     if ((!linkedinContent?.trim() || twitterContent?.trim())  && !files) {
       return NextResponse.json(
@@ -97,12 +97,15 @@ export async function POST(request: Request) {
       }
     }
 
-    
+    console.log(postToLinkedIn)
+    console.log(postToTwitter)
     const postData: Record<string, any> = {
       post_id: postId,
       clerk_user_id: userId,
       linkedin_content: linkedinContent,
       twitter_content: twitterContent,
+      is_linkedin: postToLinkedIn,
+      is_twitter: postToTwitter,
       scheduled_at: scheduledAt,
       status: 'scheduled',
       image_url: imageUrl,

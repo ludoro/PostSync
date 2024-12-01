@@ -12,6 +12,8 @@ interface Post {
     id: string
     linkedin_content?: string
     twitter_content?: string
+    post_to_linkedin: boolean
+    post_to_twitter: boolean
     scheduledAt: string // Keep this as a string since it's JSON-parsed
     image_url?: string
     video_url?: string

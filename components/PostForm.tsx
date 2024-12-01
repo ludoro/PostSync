@@ -233,7 +233,7 @@ export default function PostForm({date, setDate, time, setTime, content, setCont
     }
 
         // Validate platform-specific content
-        if (postToLinkedIn && !linkedinContent.trim()) {
+        if (postToLinkedIn && (!linkedinContent.trim()&& !files)) {
           toast({
             variant: "destructive",
             title: "Error",
@@ -243,7 +243,7 @@ export default function PostForm({date, setDate, time, setTime, content, setCont
           return
         }
     
-        if (postToTwitter && !twitterContent.trim()) {
+        if (postToTwitter && (!twitterContent.trim() && !files)) {
           toast({
             variant: "destructive",
             title: "Error",
@@ -317,6 +317,8 @@ export default function PostForm({date, setDate, time, setTime, content, setCont
         body: JSON.stringify({
           linkedinContent,
           twitterContent,
+          postToLinkedIn,
+          postToTwitter,
           scheduledAt,
           status,
           files: processedFiles.map(f => f.base64),

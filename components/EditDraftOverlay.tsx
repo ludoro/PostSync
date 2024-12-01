@@ -13,6 +13,8 @@ interface Post {
     id: string
     linkedin_content?: string
     twitter_content?: string
+    post_to_linkedin: boolean,
+    post_to_twitter: boolean
     scheduledAt: string
     image_url?: string
     video_url?: string
@@ -81,6 +83,8 @@ export const EditDraftOverlay: React.FC<EditDraftOverlayProps> = ({
                 ...post,
                 linkedin_content: postToLinkedIn ? linkedin_content : undefined,
                 twitter_content: postToTwitter ? twitter_content : undefined,
+                post_to_linkedin: postToLinkedIn,
+                post_to_twitter: postToTwitter,
                 scheduledAt: scheduledAt ? scheduledAt.toISOString() : post.scheduledAt
             })
             onClose()

@@ -19,21 +19,52 @@ export const deleteScheduledPostsTask = schedules.task({
       logger.log("Starting delete scheduled posts task", { 
         timestamp: payload.timestamp 
       });
+      
+      // Query to get all posts that have a "Scheduled time" that is in a delta of 2 min of current time (in UTC)
+      const { data: data_posts, error: error_posts } = await supabase
+        .from('posts')
+        .select()
+        .eq('status', 'scheduled')
+        .gte('scheduled_at', new Date(Date.now() - 2 * 60 * 1000).toISOString())
+        .lte('scheduled_at', new Date(Date.now() + 2 * 60 * 1000).toISOString());
+
+      // Log the results
+      if (error_posts) {
+        logger.error("Error deleting scheduled posts", { error_posts });
+        throw error_posts;
+      }
+
+      // Iterate through each post and perform additional actions
+      if (data_posts && data_posts.length > 0) {
+        for (const post of data_posts) {
+          logger.log("Processing scheduled post", {
+            postId: post.id,
+            scheduledAt: post.scheduled_at,
+          });
+
+          // 4. Trigger external API calls
+          // await triggerExternalPublishService(post)
+
+          // 5. Generate social media previews
+          // await generateSocialMediaPreviews(post)
+        }
+      }
+
       // Query to update scheduled posts to published
-      const { data, error } = await supabase
+      const { data: data_update, error: error_update} = await supabase
         .from('posts')
         .update({ status: 'published' })
         .eq('status', 'scheduled')
-
-      // Log the results
-      if (error) {
-        logger.error("Error deleting scheduled posts", { error });
-        throw error;
+      
+      if (error_update) {
+        logger.error("Error updating posts to published", { error_update });
+        throw error_update;
       }
 
       return {
         success: true,
         message: "Scheduled posts published task completed",
+        processedPosts: data_posts?.length || 0
       };
     } catch (error) {
       // Log any errors
