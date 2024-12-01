@@ -42,11 +42,16 @@ export const deleteScheduledPostsTask = schedules.task({
             scheduledAt: post.scheduled_at,
           });
 
-          // 4. Trigger external API calls
-          // await triggerExternalPublishService(post)
+          // Call linkedin API if post has linkedin content
+          // Fetch the token from the table for the user id of the post
 
-          // 5. Generate social media previews
-          // await generateSocialMediaPreviews(post)
+          // call the api
+
+
+          // Call twitter Api if post has twitter content
+          // Fetch token from table for the user id of the post
+
+          // call the api
         }
       }
 
