@@ -170,7 +170,7 @@ export default function Page() {
                 post.linkedin_content.substring(0, 100)}
         </p>}
 
-        { (!post.linkedin_content && post.twitter_content) && <p className="text-gray-600 text-sm">
+        {post.twitter_content && <p className="text-gray-600 text-sm">
             {
                 post.twitter_content.substring(0, 100)}
         </p>}
@@ -179,6 +179,11 @@ export default function Page() {
         <p className="text-sm text-gray-500 mt-2">
             <strong>Scheduled At:</strong> {formatDateToUserTimezone(post.scheduledAt)}
         </p>
+
+        <p className="text-sm text-gray-500 mt-2">
+            <strong>Scheduled for:</strong> {post.linkedin_content ? 'LinkedIn' : ''}{ post.twitter_content ? 'Twitter' : ''}
+        </p>
+
 
         {/* Edit Button */}
         <button
