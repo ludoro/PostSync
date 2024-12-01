@@ -12,8 +12,8 @@ interface Post {
     id: string
     content: string
     scheduledAt: string // Keep this as a string since it's JSON-parsed
-    image_url?: string[]
-    video_url?: string[]
+    image_url?: string
+    video_url?: string
 }
 
 export default function Page() {
@@ -134,28 +134,57 @@ export default function Page() {
                         <p className="text-gray-500">No Scheduled posts available.</p>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {scheduledPosts.map((post) => (
-                                <div
-                                    key={post.id}
-                                    className="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-                                >
-                                    <p className="text-black font-bold mb-2">Content</p>
-                                    <p className="text-gray-600 text-sm">
-                                        {post.content.length > 100
-                                            ? post.content.substring(0, 100) + '...'
-                                            : post.content}
-                                    </p>
-                                    <p className="text-sm text-gray-500 mt-2">
-                                        <strong>Scheduled At:</strong> {formatDateToUserTimezone(post.scheduledAt)}
-                                    </p>
-                                    <button
-                                        onClick={() => handleEdit(post)}
-                                        className="mt-4 bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700 transition"
-                                    >
-                                        Edit scheduled post
-                                    </button>
-                                </div>
-                            ))}
+                           {scheduledPosts.map((post) => (
+    <div
+        key={post.id}
+        className="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+    >
+        {/* Content */}
+        {post.image_url && (
+                <div className="mt-4">
+                    <img
+                        src={post.image_url}
+                        alt="Preview"
+                        className="w-full h-32 object-cover rounded"
+                    />
+                </div>
+            )}
+
+            {/* Video Preview */}
+            {post.video_url && (
+                <div className="mt-4">
+                    <video
+                        src={post.video_url}
+                        controls
+                        className="w-full rounded"
+                    >
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            )}
+                <p className="text-black font-bold mb-2">Content</p>
+
+        <p className="text-gray-600 text-sm">
+            {post.content.length > 100
+                ? post.content.substring(0, 100) + '...'
+                : post.content}
+        </p>
+
+        {/* Scheduled Time */}
+        <p className="text-sm text-gray-500 mt-2">
+            <strong>Scheduled At:</strong> {formatDateToUserTimezone(post.scheduledAt)}
+        </p>
+
+        {/* Edit Button */}
+        <button
+            onClick={() => handleEdit(post)}
+            className="mt-4 bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+            Edit scheduled post
+        </button>
+    </div>
+))}
+
                         </div>
                     )}
                 </main>

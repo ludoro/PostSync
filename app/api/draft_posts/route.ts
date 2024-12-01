@@ -42,8 +42,8 @@ export async function GET(request: Request) {
       created_at: draft.created_at,
       scheduledAt: draft.scheduled_at,
       files: [
-        ...(draft.image_url || []),
-        ...(draft.video_url || [])
+        ...(draft.image_url || ""),
+        ...(draft.video_url || "")
       ],
       fileTypes: [
         ...Array(draft.image_url?.length || 0).fill('image'),

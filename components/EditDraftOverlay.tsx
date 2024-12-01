@@ -11,8 +11,8 @@ interface Post {
     id: string
     content: string
     scheduledAt: string
-    image_url?: string[]
-    video_url?: string[]
+    image_url?: string
+    video_url?: string
 }
 
 interface EditDraftOverlayProps {

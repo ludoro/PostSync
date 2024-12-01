@@ -37,8 +37,8 @@ interface PostFormProps {
   setTime: (time: string) => void;
   content: string;
   setContent: (content: string) => void;
-  image_url?: string[];
-  video_url?: string[];
+  image_url?: string;
+  video_url?: string;
 }
 
 type PostStatus = 'draft' | 'scheduled' | 'published';
@@ -58,12 +58,12 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
   
     // Add image URLs
     if (image_url && image_url.length > 0) {
-      const imageFiles = image_url.map((url) => ({
-        file: new File([], url.split('/').pop() || 'image.jpg', { type: 'image/jpeg' }),
-        preview: `https://ghjciaynkxnhbgxnkbwp.supabase.co/storage/v1/object/public/schedule_stuff_bucket/files/${url.split('/').slice(-1)[0]}`,
+      const imageFile = {
+        file: new File([], image_url[0].split('/').pop() || 'image.jpg', { type: 'image/jpeg' }),
+        preview: `https://ghjciaynkxnhbgxnkbwp.supabase.co/storage/v1/object/public/schedule_stuff_bucket/files/${image_url.split('/').slice(-1)[0]}`,
         type: 'image' as const,
-      }));
-      initialFiles.push(...imageFiles);
+      };
+      initialFiles.push(imageFile);
     }
   
     // Add video URL (only one video allowed)
@@ -508,7 +508,6 @@ export default function PostForm({ existingPostId, date, setDate, time, setTime,
           </Button>
         </CardFooter>
       </Card>
-      <Toaster />
     </>
   );
 }
