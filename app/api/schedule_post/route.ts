@@ -74,7 +74,7 @@ export async function POST(request: Request) {
           continue;
         }
     
-        const filePath = `files/${postId}_${i}.${fileExt}`
+        const filePath = `files/${userId}/${postId}_${i}.${fileExt}`
 
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('schedule_stuff_bucket')
