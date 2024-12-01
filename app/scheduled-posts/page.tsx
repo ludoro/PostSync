@@ -139,13 +139,12 @@ export default function Page() {
         key={post.id}
         className="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow"
     >
-        {/* Content */}
-        {post.image_url && (
-                <div className="mt-4">
+            {post.image_url && (
+                <div className="mt-4 aspect-w-16 aspect-h-9 rounded overflow-hidden">
                     <img
                         src={post.image_url}
                         alt="Preview"
-                        className="w-full h-32 object-cover rounded"
+                        className="w-full h-full object-cover"
                     />
                 </div>
             )}
