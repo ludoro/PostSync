@@ -115,6 +115,46 @@ export default function Page() {
             window.location.href = '/scheduled-posts'
         }
     }
+
+    const handleDelete = async (updatedPost: Post) => {
+        try {
+            const response = await fetch(`/api/delete_scheduled_post/${updatedPost.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ post_id: updatedPost.id})
+            })
+    
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.error || 'Failed to delete post')
+            }
+    
+            // Store toast message in localStorage
+            localStorage.setItem('toastMessage', JSON.stringify({
+                type: 'success',
+                title: "✨ Success!",
+                description: "Post has been deleted successfully!"
+            }))
+    
+            // Use window.location for a hard reload
+            window.location.href = '/scheduled-posts'
+    
+        } catch (error) {
+            console.error('Error deleting post:', error)
+            
+            // Store error toast in localStorage
+            localStorage.setItem('toastMessage', JSON.stringify({
+                type: 'error',
+                title: "Error",
+                description: "Failed to delete post"
+            }))
+    
+            // Reload page to show error toast
+            window.location.href = '/scheduled-posts'
+        }
+    }
     
     
 
@@ -186,12 +226,24 @@ export default function Page() {
 
 
         {/* Edit Button */}
-        <button
-            onClick={() => handleEdit(post)}
-            className="mt-4 bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700 transition"
-        >
-            Edit scheduled post
-        </button>
+        <div className="mt-4">
+            <button
+                onClick={() => handleEdit(post)}
+                className="w-full bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700 transition"
+            >
+                Edit scheduled post
+            </button>
+        </div>
+        <div className="mt-4">
+            <button
+                onClick={() => handleDelete(post)}
+                className="w-full bg-red-600 text-white text-sm px-4 py-2 rounded hover:bg-red-700 transition"
+            >
+                Delete scheduled post (careful, cannot be undone)
+            </button>
+        </div>
+
+
     </div>
 ))}
 
