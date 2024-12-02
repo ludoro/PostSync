@@ -19,6 +19,20 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Check if the user id exists in the twitter_connections table
+    const { data: connectionData, error: connectionError } = await supabase
+      .from('twitter_connections')
+      .select('clerk_user_id')
+      .eq('clerk_user_id', user.id)
+      .single();
+
+    if (connectionError || !connectionData) {
+      return new NextResponse(JSON.stringify({ error: 'User not found in twitter_connections' }), { 
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Retrieve the stored refresh token for the user
     const { data, error: fetchError } = await supabase
       .from('twitter_connections')
